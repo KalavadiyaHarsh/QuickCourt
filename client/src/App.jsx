@@ -83,15 +83,21 @@ function App() {
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/profile" element={<ProfilePage />} />
               <Route path="/venue/:venueId/:courtId" element={<VenueBookingPage />} />
+              
+              {/* Admin Routes */}
+              <Route path="/admin" element={<AdminDashboard />} />
+              <Route path="/admin/users" element={<UserManagement />} />
+              <Route path="/admin/venues" element={<FacilityApproval />} />
+              
+              {/* Facility Owner Routes */}
               <Route path="/Owner" element={<FacilityOwnerDashboard />} />
               <Route path="/facility-management" element={<FacilityManagement />} />
               <Route path="/court-management" element={<CourtManagement />} />
+              
+              {/* Additional Routes */}
               <Route path="/booking" element={<NewBookingPage />} />
               <Route path="/about" element={<div className='p-6'>About VenueBooking</div>} />
               <Route path="/contact" element={<div className='p-6'>Contact us</div>} />
-              <Route path="/admin" element={<AdminDashboard />} />
-              <Route path="/admin/users" element={<UserManagement />} />
-              <Route path="/admin/facilities" element={<FacilityApproval />} />
             </Routes>
           </Layout>
 

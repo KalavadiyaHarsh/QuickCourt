@@ -1,61 +1,322 @@
-import Sidebar from "../components/admin/Sidebar";
-import Topbar from "../components/admin/Topbar";
-import StatCard from "../components/admin/StatCard";
-import BookingActivityChart from "../components/admin/BookingActivityChart";
-import UserRegistrationChart from "../components/admin/UserRegistrationChart";
-import FacilityApprovalChart from "../components/admin/FacilityApprovalChart";
-import MostActiveSportsChart from "../components/admin/MostActiveSportsChart";
-import EarningsChart from "../components/admin/EarningsChart";
+import React, { useState, useEffect, useContext } from "react";
+import { MyContext } from "../App";
+import { useNavigate } from "react-router-dom";
+import { fetchDataFromApi } from "../utils/api";
+import { FaUsers, FaBuilding, FaChartBar, FaCalendar, FaSpinner, FaExclamationTriangle, FaCheckCircle, FaClock, FaBan } from "react-icons/fa";
+import { useScrollToTop } from "../hooks/useScrollToTop";
 
 const AdminDashboard = () => {
-  // Dummy data for now
-  const bookingData = [
-    { date: "Jan", bookings: 40 },
-    { date: "Feb", bookings: 55 },
-    { date: "Mar", bookings: 75 },
-  ];
-  const registrationData = [
-    { month: "Jan", registrations: 100 },
-    { month: "Feb", registrations: 150 },
-    { month: "Mar", registrations: 200 },
-  ];
-  const approvalData = [
-    { month: "Jan", approvals: 10 },
-    { month: "Feb", approvals: 15 },
-    { month: "Mar", approvals: 8 },
-  ];
-  const sportsData = [
-    { name: "Badminton", value: 40 },
-    { name: "Tennis", value: 25 },
-    { name: "Football", value: 20 },
-    { name: "Table Tennis", value: 15 },
-  ];
-  const earningsData = [
-    { month: "Jan", earnings: 1200 },
-    { month: "Feb", earnings: 1500 },
-    { month: "Mar", earnings: 1800 },
-  ];
+  const context = useContext(MyContext);
+  const navigate = useNavigate();
+  const [dashboardData, setDashboardData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Use custom hook for scroll to top
+  useScrollToTop();
+
+  // Check if user is admin
+  useEffect(() => {
+    const checkAdminAccess = () => {
+      const userData = context.userData || JSON.parse(localStorage.getItem('userData') || '{}');
+      
+      if (!context.isLogin) {
+        navigate('/login');
+        return;
+      }
+
+      if (userData.role !== 'admin') {
+        navigate('/');
+        context.openAlertBox && context.openAlertBox("Access denied. Admin privileges required.", "error");
+        return;
+      }
+    };
+
+    checkAdminAccess();
+  }, [context.isLogin, context.userData, navigate, context]);
+
+  // Fetch admin dashboard data
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const response = await fetchDataFromApi('/admin/dashboard');
+
+        if (response?.success) {
+          setDashboardData(response.data);
+        } else {
+          setError(response?.message || "Failed to fetch dashboard data");
+        }
+      } catch (error) {
+        console.error("Error fetching dashboard data:", error);
+        setError("Failed to fetch dashboard data");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (context.isLogin && context.userData?.role === 'admin') {
+      fetchDashboardData();
+    }
+  }, [context.isLogin, context.userData]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-emerald-50 flex items-center justify-center">
+        <FaSpinner className="animate-spin text-4xl text-blue-600" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-emerald-50 p-6">
+        <div className="max-w-4xl mx-auto text-center py-12">
+          <FaExclamationTriangle className="text-red-500 text-6xl mx-auto mb-4" />
+          <p className="text-red-600 text-lg mb-4">{error}</p>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!dashboardData) {
+    return null;
+  }
+
+  const { stats, userStats, venueStats, recentUsers, pendingVenues, recentBookings } = dashboardData;
 
   return (
-    <div className="flex">
-      <Sidebar />
-      <div className="flex-1">
-        <Topbar />
-        {/* Global Stats */}
-        <div className="p-6 grid grid-cols-1 md:grid-cols-4 gap-6">
-          <StatCard title="Total Users" value="1,240" />
-          <StatCard title="Total Facility Owners" value="320" />
-          <StatCard title="Total Bookings" value="4,560" />
-          <StatCard title="Total Active Courts" value="85" />
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-emerald-50 p-6">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-red-600 to-purple-600 bg-clip-text text-transparent mb-2">
+            System Administration Dashboard
+          </h1>
+          <p className="text-gray-600 text-lg">
+            Welcome back, {context.userData?.fullName || 'Admin'}! Manage your system and monitor all activities.
+          </p>
         </div>
 
-        {/* Charts */}
-        <div className="p-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <BookingActivityChart data={bookingData} />
-          <UserRegistrationChart data={registrationData} />
-          <FacilityApprovalChart data={approvalData} />
-          <MostActiveSportsChart data={sportsData} />
-          <EarningsChart data={earningsData} />
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div className="bg-white/90 backdrop-blur-md rounded-2xl shadow-xl p-6 border border-white/20">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-gray-600 text-sm font-medium">Total Users</p>
+                <p className="text-3xl font-bold text-blue-600">{stats.totalUsers}</p>
+              </div>
+              <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                <FaUsers className="text-blue-600 text-xl" />
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white/90 backdrop-blur-md rounded-2xl shadow-xl p-6 border border-white/20">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-gray-600 text-sm font-medium">Total Venues</p>
+                <p className="text-3xl font-bold text-purple-600">{stats.totalVenues}</p>
+              </div>
+              <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
+                <FaBuilding className="text-purple-600 text-xl" />
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white/90 backdrop-blur-md rounded-2xl shadow-xl p-6 border border-white/20">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-gray-600 text-sm font-medium">Total Bookings</p>
+                <p className="text-3xl font-bold text-emerald-600">{stats.totalBookings}</p>
+              </div>
+              <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center">
+                <FaCalendar className="text-emerald-600 text-xl" />
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white/90 backdrop-blur-md rounded-2xl shadow-xl p-6 border border-white/20">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-gray-600 text-sm font-medium">Total Revenue</p>
+                <p className="text-3xl font-bold text-green-600">₹{stats.totalRevenue}</p>
+              </div>
+              <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+                <FaChartBar className="text-green-600 text-xl" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Role Distribution & Venue Status */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+          {/* User Role Distribution */}
+          <div className="bg-white/90 backdrop-blur-md rounded-2xl shadow-xl p-6 border border-white/20">
+            <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+              <FaUsers className="text-blue-600" />
+              User Role Distribution
+            </h3>
+            <div className="space-y-3">
+              {userStats.map((stat, index) => (
+                <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <span className="font-medium text-gray-800 capitalize">{stat._id}</span>
+                  <span className="text-blue-600 font-bold">{stat.count}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Venue Status Distribution */}
+          <div className="bg-white/90 backdrop-blur-md rounded-2xl shadow-xl p-6 border border-white/20">
+            <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+              <FaBuilding className="text-purple-600" />
+              Venue Status Distribution
+            </h3>
+            <div className="space-y-3">
+              {venueStats.map((stat, index) => (
+                <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <span className="font-medium text-gray-800 capitalize">{stat._id}</span>
+                  <span className="text-purple-600 font-bold">{stat.count}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Recent Activity */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Recent Users */}
+          <div className="bg-white/90 backdrop-blur-md rounded-2xl shadow-xl p-6 border border-white/20">
+            <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+              <FaUsers className="text-blue-600" />
+              Recent Users
+            </h3>
+            <div className="space-y-3">
+              {recentUsers.map((user, index) => (
+                <div key={user._id || index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div>
+                    <p className="font-medium text-gray-800">{user.fullName}</p>
+                    <p className="text-sm text-gray-600">{user.email}</p>
+                    <p className="text-xs text-gray-500 capitalize">{user.role}</p>
+                  </div>
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                    user.status === 'active' ? 'bg-green-100 text-green-800' :
+                    user.status === 'suspended' ? 'bg-red-100 text-red-800' :
+                    'bg-gray-100 text-gray-800'
+                  }`}>
+                    {user.status}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Pending Venues */}
+          <div className="bg-white/90 backdrop-blur-md rounded-2xl shadow-xl p-6 border border-white/20">
+            <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+              <FaClock className="text-yellow-600" />
+              Pending Venues
+            </h3>
+            <div className="space-y-3">
+              {pendingVenues.map((venue, index) => (
+                <div key={venue._id || index} className="p-3 bg-gray-50 rounded-lg">
+                  <p className="font-medium text-gray-800">{venue.name}</p>
+                  <p className="text-sm text-gray-600">
+                    {venue.address?.city}, {venue.address?.state}
+                  </p>
+                  <p className="text-xs text-gray-500">Owner: {venue.owner?.fullName}</p>
+                  <div className="flex gap-2 mt-2">
+                    <button className="px-2 py-1 bg-green-100 text-green-800 rounded text-xs hover:bg-green-200">
+                      Approve
+                    </button>
+                    <button className="px-2 py-1 bg-red-100 text-red-800 rounded text-xs hover:bg-red-200">
+                      Reject
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Recent Bookings */}
+          <div className="bg-white/90 backdrop-blur-md rounded-2xl shadow-xl p-6 border border-white/20">
+            <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+              <FaCalendar className="text-emerald-600" />
+              Recent Bookings
+            </h3>
+            <div className="space-y-3">
+              {recentBookings.map((booking, index) => (
+                <div key={booking._id || index} className="p-3 bg-gray-50 rounded-lg">
+                  <div className="flex justify-between items-start mb-2">
+                    <p className="font-medium text-gray-800">
+                      {booking.user?.fullName || 'Unknown User'}
+                    </p>
+                    <span className="text-sm font-bold text-green-600">
+                      ₹{booking.totalAmount}
+                    </span>
+                  </div>
+                  <p className="text-sm text-gray-600">{booking.venue?.name}</p>
+                  <div className="flex gap-2 mt-2">
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                      booking.bookingStatus === 'confirmed' ? 'bg-green-100 text-green-800' :
+                      booking.bookingStatus === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                      'bg-red-100 text-red-800'
+                    }`}>
+                      {booking.bookingStatus}
+                    </span>
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                      booking.paymentStatus === 'paid' ? 'bg-green-100 text-green-800' :
+                      'bg-yellow-100 text-yellow-800'
+                    }`}>
+                      {booking.paymentStatus}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Quick Actions */}
+        <div className="mt-8 bg-white/90 backdrop-blur-md rounded-2xl shadow-xl p-6 border border-white/20">
+          <h3 className="text-xl font-bold text-gray-800 mb-4">Quick Actions</h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <button
+              onClick={() => navigate('/admin/users')}
+              className="p-4 bg-blue-50 hover:bg-blue-100 rounded-xl border border-blue-200 transition-colors text-left"
+            >
+              <FaUsers className="text-blue-600 text-xl mb-2" />
+              <p className="font-medium text-blue-800">Manage Users</p>
+              <p className="text-sm text-blue-600">View, suspend, or manage user accounts</p>
+            </button>
+
+            <button
+              onClick={() => navigate('/admin/venues')}
+              className="p-4 bg-purple-50 hover:bg-purple-100 rounded-xl border border-purple-200 transition-colors text-left"
+            >
+              <FaBuilding className="text-purple-600 text-xl mb-2" />
+              <p className="font-medium text-purple-800">Approve Venues</p>
+              <p className="text-sm text-purple-600">Review and approve pending venue submissions</p>
+            </button>
+
+            <button
+              onClick={() => navigate('/allvenue')}
+              className="p-4 bg-emerald-50 hover:bg-emerald-100 rounded-xl border border-emerald-200 transition-colors text-left"
+            >
+              <FaChartBar className="text-emerald-600 text-xl mb-2" />
+              <p className="font-medium text-emerald-800">View All Venues</p>
+              <p className="text-sm text-emerald-600">Browse and monitor all venue listings</p>
+            </button>
+          </div>
         </div>
       </div>
     </div>

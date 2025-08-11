@@ -1,54 +1,286 @@
-import React, { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
-import { FaCalendarCheck, FaTableTennis, FaDollarSign, FaCalendarAlt } from 'react-icons/fa';
-import KPICard from '../components/KPICard';
-import BookingCalendar from '../components/BookingCalendar';
-import BookingTrendsChart from '../components/BookingTrendsChart';
-import EarningsChart from '../components/EarningsChart';
-import PeakHoursChart from '../components/PeakHoursChart';
-import { getDashboardData } from '../api/dashboardApi';
+import React, { useState, useEffect, useContext } from "react";
+import { MyContext } from "../App";
+import { useNavigate } from "react-router-dom";
+import { fetchDataFromApi } from "../utils/api";
+import { FaUsers, FaBuilding, FaChartBar, FaCalendar, FaSpinner, FaExclamationTriangle } from "react-icons/fa";
+import { useScrollToTop } from "../hooks/useScrollToTop";
 
 const FacilityOwnerDashboard = () => {
-  const [data, setData] = useState(null);
+  const context = useContext(MyContext);
+  const navigate = useNavigate();
+  const [dashboardData, setDashboardData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
+  // Use custom hook for scroll to top
+  useScrollToTop();
+
+  // Check if user is admin
   useEffect(() => {
-    getDashboardData().then(setData);
-  }, []);
+    const checkAdminAccess = () => {
+      const userData = context.userData || JSON.parse(localStorage.getItem('userData') || '{}');
+      
+      if (!context.isLogin) {
+        navigate('/login');
+        return;
+      }
 
-  if (!data) return <div className="p-8">Loading dashboard...</div>;
+      if (userData.role !== 'admin') {
+        navigate('/');
+        context.openAlertBox && context.openAlertBox("Access denied. Admin privileges required.", "error");
+        return;
+      }
+    };
+
+    checkAdminAccess();
+  }, [context.isLogin, context.userData, navigate, context]);
+
+  // Fetch facility owner dashboard data
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const response = await fetchDataFromApi('/api/facility-owner/dashboard');
+
+        if (response?.success) {
+          setDashboardData(response.data);
+        } else {
+          setError(response?.message || "Failed to fetch dashboard data");
+        }
+      } catch (error) {
+        console.error("Error fetching dashboard data:", error);
+        setError("Failed to fetch dashboard data");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (context.isLogin && context.userData?.role === 'facility_owner') {
+      fetchDashboardData();
+    }
+  }, [context.isLogin, context.userData]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-emerald-50 flex items-center justify-center">
+        <FaSpinner className="animate-spin text-4xl text-blue-600" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-emerald-50 p-6">
+        <div className="max-w-4xl mx-auto text-center py-12">
+          <FaExclamationTriangle className="text-red-500 text-6xl mx-auto mb-4" />
+          <p className="text-red-600 text-lg mb-4">{error}</p>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!dashboardData) {
+    return null;
+  }
+
+  const { stats, recentUsers, recentVenues, recentBookings } = dashboardData;
 
   return (
-    <div className="p-8 bg-gray-50 min-h-screen">
-      {/* Welcome Message */}
-      <motion.h1
-        className="text-3xl font-bold mb-6"
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-      >
-        Welcome back, Facility Owner! 👋
-      </motion.h1>
-
-      {/* KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <KPICard title="Total Bookings" value={data.totalBookings} icon={<FaCalendarCheck />} />
-        <KPICard title="Active Courts" value={data.activeCourts} icon={<FaTableTennis />} />
-        <KPICard title="Earnings" value={`$${data.earnings}`} icon={<FaDollarSign />} />
-        <KPICard title="Booking Calendar" value="View" icon={<FaCalendarAlt />} />
-      </div>
-
-      {/* Charts & Calendar */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
-          <BookingTrendsChart data={data.bookingTrends} />
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-emerald-50 p-6">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
+            Admin Dashboard
+          </h1>
+          <p className="text-gray-600 text-lg">
+            Welcome back, {context.userData?.fullName || 'Admin'}! Here's what's happening in your system.
+          </p>
         </div>
-        <div>
-          <BookingCalendar />
-        </div>
-      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
-        <EarningsChart data={data.earningsSummary} />
-        <PeakHoursChart data={data.peakHours} />
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div className="bg-white/90 backdrop-blur-md rounded-2xl shadow-xl p-6 border border-white/20">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-gray-600 text-sm font-medium">Total Users</p>
+                <p className="text-3xl font-bold text-blue-600">{stats.totalUsers}</p>
+              </div>
+              <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                <FaUsers className="text-blue-600 text-xl" />
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white/90 backdrop-blur-md rounded-2xl shadow-xl p-6 border border-white/20">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-gray-600 text-sm font-medium">Total Venues</p>
+                <p className="text-3xl font-bold text-purple-600">{stats.totalVenues}</p>
+              </div>
+              <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
+                <FaBuilding className="text-purple-600 text-xl" />
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white/90 backdrop-blur-md rounded-2xl shadow-xl p-6 border border-white/20">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-gray-600 text-sm font-medium">Total Bookings</p>
+                <p className="text-3xl font-bold text-emerald-600">{stats.totalBookings}</p>
+              </div>
+              <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center">
+                <FaCalendar className="text-emerald-600 text-xl" />
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white/90 backdrop-blur-md rounded-2xl shadow-xl p-6 border border-white/20">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-gray-600 text-sm font-medium">Total Revenue</p>
+                <p className="text-3xl font-bold text-green-600">₹{stats.totalRevenue}</p>
+              </div>
+              <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+                <FaChartBar className="text-green-600 text-xl" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Recent Activity */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Recent Users */}
+          <div className="bg-white/90 backdrop-blur-md rounded-2xl shadow-xl p-6 border border-white/20">
+            <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+              <FaUsers className="text-blue-600" />
+              Recent Users
+            </h3>
+            <div className="space-y-3">
+              {recentUsers.map((user, index) => (
+                <div key={user._id || index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div>
+                    <p className="font-medium text-gray-800">{user.fullName}</p>
+                    <p className="text-sm text-gray-600">{user.email}</p>
+                    <p className="text-xs text-gray-500 capitalize">{user.role}</p>
+                  </div>
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                    user.status === 'active' ? 'bg-green-100 text-green-800' :
+                    user.status === 'inactive' ? 'bg-gray-100 text-gray-800' :
+                    'bg-red-100 text-red-800'
+                  }`}>
+                    {user.status}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Recent Venues */}
+          <div className="bg-white/90 backdrop-blur-md rounded-2xl shadow-xl p-6 border border-white/20">
+            <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+              <FaBuilding className="text-purple-600" />
+              Recent Venues
+            </h3>
+            <div className="space-y-3">
+              {recentVenues.map((venue, index) => (
+                <div key={venue._id || index} className="p-3 bg-gray-50 rounded-lg">
+                  <p className="font-medium text-gray-800">{venue.name}</p>
+                  <p className="text-sm text-gray-600">
+                    {venue.address?.city}, {venue.address?.state}
+                  </p>
+                  <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium mt-1 ${
+                    venue.status === 'approved' ? 'bg-green-100 text-green-800' :
+                    venue.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                    'bg-red-100 text-red-800'
+                  }`}>
+                    {venue.status}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Recent Bookings */}
+          <div className="bg-white/90 backdrop-blur-md rounded-2xl shadow-xl p-6 border border-white/20">
+            <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+              <FaCalendar className="text-emerald-600" />
+              Recent Bookings
+            </h3>
+            <div className="space-y-3">
+              {recentBookings.map((booking, index) => (
+                <div key={booking._id || index} className="p-3 bg-gray-50 rounded-lg">
+                  <div className="flex justify-between items-start mb-2">
+                    <p className="font-medium text-gray-800">
+                      {booking.user?.fullName || 'Unknown User'}
+                    </p>
+                    <span className="text-sm font-bold text-green-600">
+                      ₹{booking.totalAmount}
+                    </span>
+                  </div>
+                  <p className="text-sm text-gray-600">{booking.venue?.name}</p>
+                  <div className="flex gap-2 mt-2">
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                      booking.bookingStatus === 'confirmed' ? 'bg-green-100 text-green-800' :
+                      booking.bookingStatus === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                      'bg-red-100 text-red-800'
+                    }`}>
+                      {booking.bookingStatus}
+                    </span>
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                      booking.paymentStatus === 'paid' ? 'bg-green-100 text-green-800' :
+                      'bg-yellow-100 text-yellow-800'
+                    }`}>
+                      {booking.paymentStatus}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Quick Actions */}
+        <div className="mt-8 bg-white/90 backdrop-blur-md rounded-2xl shadow-xl p-6 border border-white/20">
+          <h3 className="text-xl font-bold text-gray-800 mb-4">Quick Actions</h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <button
+              onClick={() => navigate('/facility-management')}
+              className="p-4 bg-blue-50 hover:bg-blue-100 rounded-xl border border-blue-200 transition-colors text-left"
+            >
+              <FaBuilding className="text-blue-600 text-xl mb-2" />
+              <p className="font-medium text-blue-800">Manage Venues</p>
+              <p className="text-sm text-blue-600">Approve, reject, or manage venue listings</p>
+            </button>
+
+            <button
+              onClick={() => navigate('/court-management')}
+              className="p-4 bg-purple-50 hover:bg-purple-100 rounded-xl border border-purple-200 transition-colors text-left"
+            >
+              <FaUsers className="text-purple-600 text-xl mb-2" />
+              <p className="font-medium text-purple-800">Manage Users</p>
+              <p className="text-sm text-purple-600">View and manage user accounts</p>
+            </button>
+
+            <button
+              onClick={() => navigate('/allvenue')}
+              className="p-4 bg-emerald-50 hover:bg-emerald-100 rounded-xl border border-emerald-200 transition-colors text-left"
+            >
+              <FaChartBar className="text-emerald-600 text-xl mb-2" />
+              <p className="font-medium text-emerald-800">View All Venues</p>
+              <p className="text-sm text-emerald-600">Browse and manage all venue listings</p>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );
