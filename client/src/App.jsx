@@ -12,7 +12,6 @@ import Register from './pages/Register';
 import Verify from './pages/Verify';
 import ForgotPassword from './pages/ForgotPassword';
 import ProfilePage from './pages/ProfilePage';
-import VenueBookingPage from './pages/VenueBookingPage';
 import FacilityOwnerDashboard from './pages/FacilityOwnerDashboard';
 import CourtManagement from './pages/CourtManagement';
 import FacilityManagement from './pages/FacilityManagement'
@@ -71,7 +70,6 @@ function App() {
               <Route path="/verify" element={<Verify />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/profile" element={<ProfilePage />} />
-              <Route path="/venue" element={<VenueBookingPage />} />
               <Route path="/Owner" element={<FacilityOwnerDashboard />} />
               <Route path="/facility-management" element={<FacilityManagement />} />
               <Route path="/court-management" element={<CourtManagement />} />
