@@ -1,10 +1,17 @@
-import React from 'react';
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import HomePage from "./pages/HomePage";
 
-const App = () => {
+import ProfilePage from "./pages/ProfilePage";
+
+function App() {
   return (
-    <div className='bg-red-500 '>
-      hi jay is here
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/profile" element={<ProfilePage />} />
+      </Routes>
+    </Router>
   );
 }
 
