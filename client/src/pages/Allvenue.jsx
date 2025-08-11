@@ -207,4 +207,4 @@ const Allvenue = () => {
   );
 };
 
-export default AllVenue;
+export default Allvenue;

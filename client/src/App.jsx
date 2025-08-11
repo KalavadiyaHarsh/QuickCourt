@@ -19,7 +19,7 @@ import NewBookingPage from './pages/NewBookingPage';
 import AdminDashboard from "./pages/AdminDashboard";
 import UserManagement from "./pages/UserManagement";
 import FacilityApproval from "./pages/FacilityApproval";
-
+import VenueBookingPage from './pages/VenueBookingPage';
 
 import { fetchDataFromApi } from './utils/api';
 
