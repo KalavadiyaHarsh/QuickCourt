@@ -413,3 +413,8 @@ button .MuiCircularProgress-root {
     max-width: 700px !important;
 }
 
+.my-box {
+  width: 300px;       /* fixed width */
+  height: 200px;      /* fixed height */
+  overflow: auto;     /* scroll instead of resize */
+}

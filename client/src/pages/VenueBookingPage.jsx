@@ -31,20 +31,6 @@ const VenueBookingPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      {/* Top Navbar (updated to match screenshot) */}
-      <div className="bg-gradient-to-r from-green-500 via-blue-500 to-blue-600 text-white px-6 py-3 flex justify-between items-center shadow-md">
-        <div className="font-bold text-lg">QuickCourt</div>
-        <div className="font-medium">Booking Log</div>
-        <div className="flex items-center gap-2">
-          <span>John Doe</span>
-          <img
-            src="man.png"
-            alt="User"
-            className="w-10 h-10 rounded-full border-2 border-white"
-          />
-        </div>
-      </div>
-
       {/* Court Info */}
       <div className="max-w-4xl mx-auto mt-6 bg-white p-6 rounded-xl shadow-md">
         <h2 className="text-2xl font-bold">{court.name}</h2>

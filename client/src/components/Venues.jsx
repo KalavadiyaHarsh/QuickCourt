@@ -187,9 +187,9 @@ const Venue = () => {
                   ))}
                 </div>
                 <Link to={"/venuedetails"}>
-                <button className="mt-3 w-full bg-green-500 text-white py-2 rounded hover:bg-green-600">
-                  View Details
-                </button>
+                  <button className="mt-3 w-full bg-green-500 text-white py-2 rounded hover:bg-green-600">
+                    View Details
+                  </button>
                 </Link>
               </div>
             </div>

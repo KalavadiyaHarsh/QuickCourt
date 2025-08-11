@@ -63,16 +63,6 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Top Nav */}
-      <header className="flex justify-between items-center bg-gradient-to-r from-teal-600 to-blue-700 text-white px-6 py-3 shadow-md">
-        <div className="font-bold text-lg cursor-pointer">QuickCourt</div>
-        <div className="text-lg font-semibold">Booking Log</div>
-        <div className="flex items-center space-x-3">
-          <span>{user.name}</span>
-          <img src={user.photo} alt="User" className="w-10 h-10 rounded-full border-2 border-white" />
-        </div>
-      </header>
-
       <div className="flex flex-col md:flex-row">
         {/* Sidebar (left) */}
         <ProfileSidebar

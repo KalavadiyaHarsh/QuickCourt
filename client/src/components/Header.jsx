@@ -1,27 +1,34 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { FaCalendarCheck, FaRegUser } from "react-icons/fa";
 import { Link } from 'react-router-dom';
+import { MyContext } from '../App';
 
 const Header = () => {
+  const { isLogin, userData } = useContext(MyContext) || {};
+
   return (
-    <div>
-      <header className="text-gray-800 py-3">
-        <div className="container mx-auto flex justify-between items-center">
-          <span className="text-lg font-mono">QUICKCOURT</span>
+    <header className="bg-gradient-to-r from-green-500 via-blue-500 to-blue-600 text-white px-6 py-3 flex justify-between items-center shadow-md">
+      <Link to="/" className="text-lg font-bold tracking-wide">VenueBooking</Link>
 
-          <button className="flex items-center gap-2">
-            <FaCalendarCheck className="text-xl" />
-            Book
-          </button>
+      <nav className="hidden md:flex items-center gap-6">
+        <Link to="/allvenue" className="hover:underline">Venues</Link>
+        <Link to="/venue" className="hover:underline">Book</Link>
+      </nav>
 
-          <button className="flex items-center gap-2">
-            <FaRegUser className="link text-xl" />
-            <Link to={"/login"} className='link transition  text-[15px] font-[500] '>Login</Link> | <Link to={"/register"} className='link transition text-[15px] font-[500] '>Register</Link>
-
-          </button>
-        </div>
-      </header>
-    </div>
+      <div className="flex items-center gap-3">
+        {isLogin ? (
+          <Link to="/profile" className="flex items-center gap-2 bg-white/10 hover:bg-white/20 px-3 py-1 rounded-md">
+            <FaRegUser className="text-xl" />
+            <span className="hidden sm:inline">{userData?.name || 'Profile'}</span>
+          </Link>
+        ) : (
+          <div className="flex items-center gap-2">
+            <Link to="/login" className="bg-white text-blue-700 font-medium px-3 py-1 rounded-md hover:bg-gray-100">Login</Link>
+            <Link to="/register" className="bg-blue-800 text-white font-medium px-3 py-1 rounded-md hover:bg-blue-900">Register</Link>
+          </div>
+        )}
+      </div>
+    </header>
   );
 }
 
