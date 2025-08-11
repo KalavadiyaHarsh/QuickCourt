@@ -60,6 +60,17 @@ const venueSchema = new mongoose.Schema({
     }
 });
 
+// Virtual field to populate courts
+venueSchema.virtual('courts', {
+    ref: 'Court',
+    localField: '_id',
+    foreignField: 'venue'
+});
+
+// Ensure virtual fields are serialized
+venueSchema.set('toJSON', { virtuals: true });
+venueSchema.set('toObject', { virtuals: true });
+
 // Calculate average rating for venue
 venueSchema.statics.getAverageRating = async function (venueId) {
     const obj = await this.aggregate([

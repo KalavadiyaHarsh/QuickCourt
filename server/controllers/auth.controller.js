@@ -4,6 +4,7 @@ const VerificationEmail = require('../utils/verifyEmailTemplate');
 const generatedAccessToken = require('../utils/generatedAccessToken');
 const generatedRefreshToken = require('../utils/generatedRefreshToken');
 const crypto = require('crypto');
+const jwt = require('jsonwebtoken');
 
 // Generate 6-digit OTP
 const generateOTP = () => {

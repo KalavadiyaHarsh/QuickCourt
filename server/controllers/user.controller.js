@@ -1,739 +1,745 @@
-import UserModel from '../models/User.js';
-import bcryptjs from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-import sendEmailFun from '../config/sendEmail.js';
-import VerificationEmail from '../utils/verifyEmailTemplate.js';
-import generatedAccessToken from '../utils/generatedAccessToken.js';
-import generatedRefreshToken from '../utils/generatedRefreshToken.js';
+const User = require('../models/User');
+const Venue = require('../models/Venue');
+const Booking = require('../models/Booking');
+const Court = require('../models/Court');
+const Review = require('../models/Review');
 
-import { v2 as cloudinary } from 'cloudinary';
-import fs from "fs";
-
-
-
-cloudinary.config({
-    cloud_name: process.env.cloudinary_Config_Cloud_Name,
-    api_key: process.env.cloudinary_Config_api_key,
-    api_secret: process.env.cloudinary_Config_api_secret, // Click 'View API Keys' above to copy your API secret
-    secure: true
-});
-
-
-export async function registerUserController(req, res) {
+// @desc    Get user profile
+// @route   GET /api/users/profile
+// @access  Private
+exports.getProfile = async (req, res) => {
     try {
-        let user;
-        const { name, email, password } = req.body;
+        const user = await User.findById(req.user.id);
 
-        if (!name || !email || !password) {
-            return res.status(400).json({
-                message: 'provide email, name, password',
-                error: true,
-                success: false
-            })
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found'
+            });
         }
 
-        user = await UserModel.findOne({ email: email });
-
-        if (user) {
-            return res.json({
-                message: 'User already Registered withn this Email',
-                error: true,
-                success: false
-            })
-        }
-
-
-        const verifyCode = Math.floor(100000 + Math.random() * 900000).toString();
-
-
-        const salt = await bcryptjs.genSalt(10);
-        const hashPassword = await bcryptjs.hash(password, salt);
-
-
-        user = new UserModel({
-            email: email,
-            password: hashPassword,
-            name: name,
-            otp: verifyCode,
-            otpExpires: Date.now() + 600000
-        })
-
-        await user.save();
-
-        await sendEmailFun(
-            email, // sendTo
-            "Verify email from Ecommerce App", // subject
-            "", // plain text fallback (optional)
-            VerificationEmail(name, verifyCode) // correct usage
-        );
-
-        // await sendEmailFun({
-        //     sendTo: email,
-        //     subject: "Verify email from Ecoomerce App",
-        //     text: "",
-        //     html: VerificationEmail(name, verifyCode)
-        // })
-
-        const token = jwt.sign(
-            {
+        res.status(200).json({
+            success: true,
+            data: {
+                id: user._id,
+                fullName: user.fullName,
                 email: user.email,
-                id: user.id
-            },
-            process.env.JSON_WEB_TOKEN_SECRET_KEY
+                avatar: user.avatar,
+                role: user.role,
+                isVerified: user.isVerified,
+                status: user.status,
+                createdAt: user.createdAt
+            }
+        });
+    } catch (error) {
+        console.error('Get profile error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Server error while fetching profile',
+            error: error.message
+        });
+    }
+};
+
+// @desc    Update user profile
+// @route   PUT /api/users/profile
+// @access  Private
+exports.updateProfile = async (req, res) => {
+    try {
+        const { fullName, avatar } = req.body;
+
+        const fieldsToUpdate = {};
+        if (fullName) fieldsToUpdate.fullName = fullName;
+        if (avatar) fieldsToUpdate.avatar = avatar;
+
+        const user = await User.findByIdAndUpdate(
+            req.user.id,
+            fieldsToUpdate,
+            { new: true, runValidators: true }
         );
-
-        return res.status(200).json({
-            success: true,
-            error: false,
-            message: "User registered successfully! Please verify your email.",
-            token: token,
-        })
-
-    } catch (error) {
-        return res.status(500).json({
-            message: error.message || error,
-            error: true,
-            success: false
-        })
-    }
-
-}
-
-
-export async function verifyEmailController(req, res) {
-    try {
-        const { email, otp } = req.body;
-
-        const user = await UserModel.findOne({ email: email });
-
-        if (!user) {
-            return response.status(400).json({ error: true, success: false, message: "User not found" });
-
-        }
-
-        const isCodeValid = user.otp === otp;
-        const isNotExpired = user.otpExpires > Date.now();
-
-        if (isCodeValid && isNotExpired) {
-            user.verify_email = true;
-            user.otp = null;
-            user.otpExpires = null;
-            await user.save();
-            return res.status(200).json({
-                error: false,
-                success: true,
-                message: "Email verified successfully"
-            });
-        }
-        else if (!isCodeValid) {
-            return res.status(400).json({ error: true, success: false, message: "Invalid OTP" });
-
-        }
-        else {
-            return res.status(400).json({ error: true, success: false, message: "OTP Expired" });
-        }
-
-    } catch (error) {
-        return res.status(500).json({
-            message: error.message || error,
-            error: true,
-            success: false
-        })
-    }
-
-}
-
-
-export async function loginUserController(req, res) {
-    try {
-        const { email, password } = req.body;
-
-        const user = await UserModel.findOne({ email: email })
-
-        if (!user) {
-            return res.status(400).json({
-                message: "User not register",
-                error: true,
-                success: false
-            })
-        }
-
-        if (user.status !== "Active") {
-            return res.status(400).json({
-                message: "Contact to admin",
-                error: true,
-                success: false
-            })
-        }
-
-        if (user.verify_email !== true) {
-            return res.status(400).json({
-                message: "Your Email not verify yet plaese verify your email first",
-                error: true,
-                success: false
-            })
-        }
-
-        const checkPassword = await bcryptjs.compare(password, user.password);
-
-        if (!checkPassword) {
-            return res.status(400).json({
-                message: "Check your password",
-                error: true,
-                success: false
-            })
-        }
-
-        const accesstoken = await generatedAccessToken(user._id)
-        const refreshToken = await generatedRefreshToken(user._id)
-
-        // const updateUser = await UserModel.findByIdAndDelete(user?._id, {
-        //     last_login_date: new Date()
-        // })
-
-        await UserModel.findByIdAndUpdate(user._id, {
-            last_login_date: new Date()
-        });
-
-        const cookiesOption = {
-            httpOnly: true,
-            secure: true,
-            sameSite: "None"
-        }
-
-        res.cookie('accesstoken', accesstoken, cookiesOption);
-        res.cookie('refreshToken', refreshToken, cookiesOption);
-
-
-        return res.json({
-            message: "Login successfully",
-            error: false,
-            success: true,
-            data: {
-                accesstoken,
-                refreshToken
-            }
-        })
-    } catch (error) {
-        return res.status(500).json({
-            message: error.message || error,
-            error: true,
-            success: false
-        })
-    }
-
-}
-
-
-export async function logoutController(req, res) {
-    try {
-        const userid = req.userId
-
-        const cookiesOption = {
-            httpOnly: true,
-            secure: true,
-            sameSite: "None"
-        }
-
-        res.clearCookie("accesstoken", cookiesOption)
-        res.clearCookie("refreshToken", cookiesOption)
-
-        // const removeRefreshToken = await UserModel.findByIdAndDelete(userid, {
-        //     refresh_token: ""
-        // })
-
-        await UserModel.findByIdAndUpdate(userid, {
-            refresh_token: ""
-        });
-
-        return res.json({
-            message: "Logout successfully",
-            error: false,
-            success: true
-        })
-
-
-    } catch (error) {
-        return res.status(500).json({
-            message: error.message || error,
-            error: true,
-            success: false
-        })
-    }
-}
-
-
-// Image upload
-var imagesArr = [];
-export async function userAvatarController(req, res) {
-    try {
-        imagesArr = [];
-
-        const userId = req.userId;
-        const image = req.files;
-
-        const user = await UserModel.findOne({ _id: userId })
-
-        if (!user) {
-            return response.status(400).json({ error: true, success: false, message: "User not found" });
-
-        }
-
-
-        //remove old image from cloudinary or first remove image from cloudinary
-        const imageUrl = user.avatar;
-        const urlArr = imageUrl.split("/");  //urlSegments 
-        const avatar_image = urlArr[urlArr.length - 1];  //filenameWithExtension
-        const imageName = avatar_image.split(".")[0];
-
-        if (imageName) {
-            await cloudinary.uploader.destroy(imageName);
-        }
-
-
-
-        const options = {
-            use_filename: true,
-            unique_filename: false,
-            overwrite: false,
-        };
-
-        for (let i = 0; i < image?.length; i++) {
-
-            // const img = await cloudinary.uploader.upload(
-            //     image[i].path,
-            //     options,
-            //     function(error, result){
-            //         imagesArr.push(result.secure_url);
-            //         fs.unlinkSync(`uploads/${image[i].filename}`);
-            //         console.log(image[i].filename)
-            //     }
-            // );
-
-            try {
-                const result = await cloudinary.uploader.upload(image[i].path, options);
-                imagesArr.push(result.secure_url);
-
-                // Delete the local file after successful upload
-                fs.unlinkSync(`uploads/${image[i].filename}`);
-                console.log(`Deleted: ${image[i].filename}`);
-            } catch (error) {
-                console.error(`Error uploading ${image[i].filename}:`, error);
-            }
-        }
-
-        user.avatar = imagesArr[0];
-        await user.save();
-
-        return res.status(200).json({
-            _id: userId,
-            avatar: imagesArr[0]
-        });
-
-    } catch (error) {
-        return res.status(500).json({
-            message: error.message || error,
-            error: true,
-            success: false
-        })
-    }
-}
-
-
-// export async function removeImageFromCloudinary(req,res) {
-//     const imgUrl = req.query.img;
-
-//     const urlArr = imgUrl.split("/");
-//     const image = urlArr[urlArr.length - 1];
-
-//     const imageName = image.split(".")[0];
-
-//     if(imageName){
-//         const resu = await cloudinary.uploader.destroy(
-//             imageName,
-//             (error, result) => {
-
-//             }
-//         );
-
-//         if(resu)
-//         {
-//             res.status(200).send(resu);
-//         }
-//     }
-// }
-
-export async function removeImageFromCloudinary(req, res) {
-    try {
-        const imageUrl = req.query.img;
-
-        if (!imageUrl) {
-            return res.status(400).json({ error: "Image URL is required" });
-        }
-
-        const urlArr = imageUrl.split("/");  //urlSegments 
-        const image = urlArr[urlArr.length - 1];  //filenameWithExtension
-        const imageName = image.split(".")[0];
-
-        const cloudinaryresult = await cloudinary.uploader.destroy(imageName);
-
-        if (cloudinaryresult.result === "ok") {
-            return res.status(200).json({
-                message: "Image deleted successfully",
-                data: cloudinaryresult
-            });
-        } else {
-            return res.status(404).json({
-                error: "Image not found or already deleted",
-                data: cloudinaryresult
-            });
-        }
-    } catch (error) {
-        console.error("Error deleting image:", error);
-        return res.status(500).json({
-            error: "Internal server error",
-            details: error.message
-        });
-    }
-}
-
-
-//update user details
-export async function updateUserDetails(req, res) {
-    try {
-        const userId = req.userId;
-        const { name, email, mobile, password } = req.body;
-
-        const userExist = await UserModel.findById(userId);
-
-        if (!userExist) {
-            return res.status(400).send('The user cannot be Updated!');
-        }
-
-        let verifyCode = "";
-        let otpExpires = null;
-
-        if (email !== userExist.email) {
-            verifyCode = Math.floor(100000 + Math.random() * 900000).toString();
-            otpExpires = Date.now() + 10 * 60 * 1000; // 10 minutes later
-        }
-
-        let hashPassword = ""
-
-        if (password) {
-            const salt = await bcryptjs.genSalt(10);
-            hashPassword = await bcryptjs.hash(password, salt);
-        } else {
-            hashPassword = userExist.password;
-        }
-
-        const updateUser = await UserModel.findByIdAndUpdate(
-            userId,
-            {
-                name: name,
-                mobile: mobile,
-                email: email,
-                verify_email: email !== userExist.email ? false : true,
-                password: hashPassword,
-                otp: verifyCode || userExist.otp,
-                otpExpires: otpExpires || userExist.otpExpires
-            },
-            { new: true }
-        )
-
-        if (email !== userExist.email) {
-            await sendEmailFun(
-                email, // sendTo
-                "Verify email from Ecommerce App", // subject
-                "", // plain text fallback (optional)
-                VerificationEmail(name, verifyCode) // correct usage
-            )
-        }
-
-        return res.json({
-            message: "User Updated successfully",
-            error: false,
-            success: true,
-            user: updateUser
-        })
-
-
-
-    } catch (error) {
-        return res.status(500).json({
-            message: error.message || error,
-            error: true,
-            success: false
-        })
-    }
-}
-
-
-// forgot password
-export async function forgotPasswordController(req, res) {
-    try {
-        const { email } = req.body;
-
-        const user = await UserModel.findOne({ email: email })
-
-        if (!user) {
-            return res.status(400).json({
-                message: "Email not available",
-                error: true,
-                success: false
-            })
-        }
-
-        // Generate 6-digit OTP
-        let verifyCode = Math.floor(100000 + Math.random() * 900000).toString();
-
-        const updateUser = await UserModel.findByIdAndUpdate(
-            user?._id,
-            {
-                otp: verifyCode,
-                otpExpires: Date.now() + 600000 // 10 minutes
-            },
-            { new: true }
-        );
-
-        // Send email with OTP
-        await sendEmailFun(
-            email, // sendTo
-            "Verify email from Ecommerce App", // subject
-            "", // plain text fallback (optional)
-            VerificationEmail(user?.name, verifyCode) // correct usage
-        )
-
-        // Respond to frontend
-        return res.json({
-            message: "Check your email",
-            error: false,
-            success: true
-        });
-
-    } catch (error) {
-        return res.status(500).json({
-            message: error.message || error,
-            error: true,
-            success: false
-        })
-    }
-}
-
-
-export async function verifyForgotPasswordOtp(req, res) {
-    try {
-        const { email, otp } = req.body;
-
-        if (!email || !otp) {
-            return res.status(400).json({
-                message: "Provide required fields: email and otp.",
-                error: true,
-                success: false
-            });
-        }
-
-        const user = await UserModel.findOne({ email });
-
-        if (!user) {
-            return res.status(400).json({
-                message: "Email not available",
-                error: true,
-                success: false
-            });
-        }
-
-        if (otp !== user.otp) {
-            return res.status(400).json({
-                message: "Invalid OTP",
-                error: true,
-                success: false
-            });
-        }
-
-        const currentTime = Date.now();
-
-        if (user.otpExpires < currentTime) {
-            return res.status(400).json({
-                message: "OTP has expired",
-                error: true,
-                success: false
-            });
-        }
-
-        // Clear OTP after successful verification
-        user.otp = "";
-        user.otpExpires = null;
-        await user.save();
-
-        return res.status(200).json({
-            message: "OTP verified successfully",
-            error: false,
-            success: true
-        });
-
-    } catch (error) {
-        return res.status(500).json({
-            message: error.message || "Server error",
-            error: true,
-            success: false
-        });
-    }
-}
-
-
-//reset password
-export async function resetPassword(req, res) {
-    try {
-        const { email, newPassword, confirmPassword } = req.body;
-
-        if (!email || !newPassword || !confirmPassword) {
-            return res.status(400).json({
-                message: "Provide required fields: email, newPassword, confirmPassword",
-                error: true,
-                success: false
-            });
-        }
-
-        const user = await UserModel.findOne({ email });
-
-        if (!user) {
-            return res.status(400).json({
-                message: "Email not available",
-                error: true,
-                success: false
-            });
-        }
-
-        if (newPassword !== confirmPassword) {
-            return res.status(400).json({
-                message: "newPassword and confirmPassword must be the same.",
-                error: true,
-                success: false
-            });
-        }
-
-        const salt = await bcryptjs.genSalt(10);
-        const hashPassword = await bcryptjs.hash(newPassword, salt);
-
-        const update = await UserModel.findByIdAndUpdate(user._id, {
-            password: hashPassword
-        });
-
-        if (!update) {
-            return res.status(500).json({
-                message: "Failed to update password",
-                error: true,
-                success: false
-            });
-        }
-
-        return res.json({
-            message: "Password updated successfully.",
-            error: false,
-            success: true
-        });
-
-    } catch (error) {
-        return res.status(500).json({
-            message: error.message || "Server error",
-            error: true,
-            success: false
-        });
-    }
-}
-
-
-//refresh-token controler
-export async function refreshToken(req, res) {
-    try {
-        const refreshToken = req.cookies.refreshToken || req?.headers?.authorization?.split(" ")[1];
-
-        if (!refreshToken) {
-            return res.status(401).json({
-                message: "Refresh token not provided",
-                error: true,
-                success: false
-            });
-        }
-
-        let verifyToken;
-        try {
-            verifyToken = jwt.verify(refreshToken, process.env.SECRET_KEY_REFRESH_TOKEN);
-        } catch (err) {
-            return res.status(401).json({
-                message: "Invalid or expired refresh token",
-                error: true,
-                success: false
-            });
-        }
-
-        const userId = verifyToken?._id;
-
-        const newAccessToken = generatedAccessToken(userId);
-
-        const cookiesOption = {
-            httpOnly: true,
-            secure: true,
-            sameSite: "None"
-        };
-
-        res.cookie('accessToken', newAccessToken, cookiesOption);
-
-        return res.json({
-            message: "New access token generated",
-            error: false,
-            success: true,
-            data: {
-                accessToken: newAccessToken
-            }
-        });
-
-    } catch (error) {
-        return res.status(500).json({
-            message: error.message || "Server error",
-            error: true,
-            success: false
-        });
-    }
-}
-
-
-
-export async function userDetails(req, res) {
-    try {
-        const userId = req.userId;
-
-        if (!userId) {
-            return res.status(401).json({
-                message: "Unauthorized: userId not provided",
-                error: true,
-                success: false
-            });
-        }
-
-        const user = await UserModel.findById(userId).select('-password -refresh_token');
 
         if (!user) {
             return res.status(404).json({
-                message: "User not found",
-                error: true,
-                success: false
+                success: false,
+                message: 'User not found'
             });
         }
 
-        return res.json({
-            message: "User details fetched successfully",
-            data: user,
-            error: false,
-            success: true
+        res.status(200).json({
+            success: true,
+            message: 'Profile updated successfully',
+            data: {
+                id: user._id,
+                fullName: user.fullName,
+                email: user.email,
+                avatar: user.avatar,
+                role: user.role,
+                isVerified: user.isVerified,
+                status: user.status
+            }
         });
-
     } catch (error) {
-        return res.status(500).json({
-            message: error.message || "Server error",
-            error: true,
-            success: false
+        console.error('Update profile error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Server error while updating profile',
+            error: error.message
         });
     }
-}
+};
+
+// @desc    Get all venues (with search and filters)
+// @route   GET /api/users/venues
+// @access  Private
+exports.getVenues = async (req, res) => {
+    try {
+        const {
+            search,
+            sport,
+            minPrice,
+            maxPrice,
+            rating,
+            city,
+            page = 1,
+            limit = 10
+        } = req.query;
+
+        // Build query
+        let query = { status: 'approved' };
+
+        // Search by venue name or description
+        if (search) {
+            query.$or = [
+                { name: { $regex: search, $options: 'i' } },
+                { description: { $regex: search, $options: 'i' } }
+            ];
+        }
+
+        // Filter by city
+        if (city) {
+            query['address.city'] = { $regex: city, $options: 'i' };
+        }
+
+        // Filter by rating
+        if (rating) {
+            query.rating = { $gte: parseFloat(rating) };
+        }
+
+        // Get venues with proper population
+        let venues = await Venue.find(query)
+            .populate({
+                path: 'courts',
+                match: sport ? { sport: sport } : {},
+                select: 'sport pricePerHour name'
+            })
+            .select('name description address photos amenities rating createdAt')
+            .lean();
+
+        // Filter venues based on court criteria (sport and price)
+        let filteredVenues = [];
+
+        for (let venue of venues) {
+            // If no courts found for this venue, skip it
+            if (!venue.courts || venue.courts.length === 0) {
+                continue;
+            }
+
+            let validCourts = venue.courts;
+
+            // Apply price filtering
+            if (minPrice || maxPrice) {
+                validCourts = validCourts.filter(court => {
+                    const price = court.pricePerHour;
+                    const minValid = !minPrice || price >= parseFloat(minPrice);
+                    const maxValid = !maxPrice || price <= parseFloat(maxPrice);
+                    return minValid && maxValid;
+                });
+            }
+
+            // If no courts meet the price criteria, skip this venue
+            if (validCourts.length === 0) {
+                continue;
+            }
+
+            // Add processed data to venue
+            venue.courts = validCourts;
+            venue.sportsAvailable = [...new Set(validCourts.map(court => court.sport))];
+            venue.startingPrice = Math.min(...validCourts.map(court => court.pricePerHour));
+            venue.courtCount = validCourts.length;
+
+            filteredVenues.push(venue);
+        }
+
+        // Sort by rating (descending) then by creation date
+        filteredVenues.sort((a, b) => {
+            if (b.rating !== a.rating) {
+                return b.rating - a.rating;
+            }
+            return new Date(b.createdAt) - new Date(a.createdAt);
+        });
+
+        // Pagination
+        const skip = (page - 1) * limit;
+        const paginatedVenues = filteredVenues.slice(skip, skip + parseInt(limit));
+
+        res.status(200).json({
+            success: true,
+            data: paginatedVenues,
+            pagination: {
+                currentPage: parseInt(page),
+                totalPages: Math.ceil(filteredVenues.length / limit),
+                totalVenues: filteredVenues.length,
+                hasNextPage: skip + parseInt(limit) < filteredVenues.length,
+                hasPrevPage: page > 1
+            }
+        });
+    } catch (error) {
+        console.error('Get venues error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Server error while fetching venues',
+            error: error.message
+        });
+    }
+};
+
+// @desc    Get single venue details
+// @route   GET /api/users/venues/:id
+// @access  Private
+exports.getVenue = async (req, res) => {
+    try {
+        const venue = await Venue.findOne({
+            _id: req.params.id,
+            status: 'approved'
+        }).populate('owner', 'fullName email');
+
+        if (!venue) {
+            return res.status(404).json({
+                success: false,
+                message: 'Venue not found or not approved'
+            });
+        }
+
+        // Get courts for this venue
+        const courts = await Court.find({ venue: venue._id })
+            .select('name sport pricePerHour capacity operatingHours');
+
+        // Get reviews for this venue
+        const reviews = await Review.find({ venue: venue._id })
+            .populate('user', 'fullName avatar')
+            .sort({ createdAt: -1 })
+            .limit(10);
+
+        const venueData = {
+            ...venue.toObject(),
+            courts,
+            reviews,
+            sportsAvailable: [...new Set(courts.map(court => court.sport))],
+            totalReviews: reviews.length
+        };
+
+        res.status(200).json({
+            success: true,
+            data: venueData
+        });
+    } catch (error) {
+        console.error('Get venue error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Server error while fetching venue',
+            error: error.message
+        });
+    }
+};
+
+// @desc    Get popular venues
+// @route   GET /api/users/venues/popular
+// @access  Private
+exports.getPopularVenues = async (req, res) => {
+    try {
+        const venues = await Venue.find({ status: 'approved' })
+            .select('name description address photos rating')
+            .sort({ rating: -1 })
+            .limit(6)
+            .lean();
+
+        // Add starting price and sports available
+        for (let venue of venues) {
+            const courts = await Court.find({ venue: venue._id })
+                .select('sport pricePerHour')
+                .lean();
+
+            venue.sportsAvailable = [...new Set(courts.map(court => court.sport))];
+            venue.startingPrice = courts.length > 0 ? Math.min(...courts.map(court => court.pricePerHour)) : 0;
+        }
+
+        res.status(200).json({
+            success: true,
+            data: venues
+        });
+    } catch (error) {
+        console.error('Get popular venues error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Server error while fetching popular venues',
+            error: error.message
+        });
+    }
+};
+
+// @desc    Get courts for a venue
+// @route   GET /api/users/venues/:venueId/courts
+// @access  Private
+exports.getVenueCourts = async (req, res) => {
+    try {
+        const { venueId } = req.params;
+        const { sport } = req.query;
+
+        let query = { venue: venueId };
+        if (sport) {
+            query.sport = sport;
+        }
+
+        const courts = await Court.find(query)
+            .select('name sport pricePerHour capacity operatingHours unavailableSlots')
+            .populate('venue', 'name address');
+
+        if (!courts.length) {
+            return res.status(404).json({
+                success: false,
+                message: 'No courts found for this venue'
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            data: courts
+        });
+    } catch (error) {
+        console.error('Get venue courts error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Server error while fetching courts',
+            error: error.message
+        });
+    }
+};
+
+// @desc    Get available time slots for a court
+// @route   GET /api/users/courts/:courtId/availability
+// @access  Private
+exports.getCourtAvailability = async (req, res) => {
+    try {
+        const { courtId } = req.params;
+        const { date } = req.query;
+
+        if (!date) {
+            return res.status(400).json({
+                success: false,
+                message: 'Date is required'
+            });
+        }
+
+        const court = await Court.findById(courtId).populate('venue', 'name');
+
+        if (!court) {
+            return res.status(404).json({
+                success: false,
+                message: 'Court not found'
+            });
+        }
+
+        const selectedDate = new Date(date);
+        const dayOfWeek = selectedDate.getDay();
+        const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+
+        // Get operating hours
+        const operatingHours = isWeekend ? court.operatingHours.weekends : court.operatingHours.weekdays;
+
+        // Get existing bookings for the date
+        const existingBookings = await Booking.find({
+            court: courtId,
+            date: {
+                $gte: new Date(selectedDate.setHours(0, 0, 0, 0)),
+                $lt: new Date(selectedDate.setHours(23, 59, 59, 999))
+            },
+            bookingStatus: { $ne: 'cancelled' }
+        }).select('timeSlots');
+
+        // Get unavailable slots
+        const unavailableSlots = court.unavailableSlots.filter(slot =>
+            new Date(slot.date).toDateString() === selectedDate.toDateString()
+        );
+
+        // Generate all possible time slots (1-hour intervals)
+        const timeSlots = [];
+        const startHour = parseInt(operatingHours.open.split(':')[0]);
+        const endHour = parseInt(operatingHours.close.split(':')[0]);
+
+        for (let hour = startHour; hour < endHour; hour++) {
+            const startTime = `${hour.toString().padStart(2, '0')}:00`;
+            const endTime = `${(hour + 1).toString().padStart(2, '0')}:00`;
+
+            // Check if slot is available
+            const isBooked = existingBookings.some(booking =>
+                booking.timeSlots.some(slot =>
+                    slot.startTime === startTime ||
+                    (slot.startTime < startTime && slot.endTime > startTime)
+                )
+            );
+
+            const isUnavailable = unavailableSlots.some(slot =>
+                slot.startTime <= startTime && slot.endTime > startTime
+            );
+
+            timeSlots.push({
+                startTime,
+                endTime,
+                isAvailable: !isBooked && !isUnavailable,
+                price: court.pricePerHour
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            data: {
+                court: {
+                    id: court._id,
+                    name: court.name,
+                    sport: court.sport,
+                    venue: court.venue,
+                    pricePerHour: court.pricePerHour
+                },
+                date,
+                timeSlots
+            }
+        });
+    } catch (error) {
+        console.error('Get court availability error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Server error while checking availability',
+            error: error.message
+        });
+    }
+};
+
+// @desc    Create a booking
+// @route   POST /api/users/bookings
+// @access  Private
+exports.createBooking = async (req, res) => {
+    try {
+        const { courtId, venueId, date, timeSlots, paymentMethod, transactionId } = req.body;
+
+        // Validate required fields
+        if (!courtId || !venueId || !date || !timeSlots || !Array.isArray(timeSlots) || timeSlots.length === 0 || !paymentMethod) {
+            return res.status(400).json({
+                success: false,
+                message: 'Court ID, venue ID, date, time slots, and payment method are required'
+            });
+        }
+
+        // Validate court exists
+        const court = await Court.findById(courtId).populate('venue');
+        if (!court) {
+            return res.status(404).json({
+                success: false,
+                message: 'Court not found'
+            });
+        }
+
+        // Validate venue matches
+        if (court.venue._id.toString() !== venueId) {
+            return res.status(400).json({
+                success: false,
+                message: 'Court does not belong to the specified venue'
+            });
+        }
+
+        // Check if venue is approved
+        if (court.venue.status !== 'approved') {
+            return res.status(400).json({
+                success: false,
+                message: 'Venue is not approved for bookings'
+            });
+        }
+
+        const bookingDate = new Date(date);
+
+        // Check if date is not in the past
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        if (bookingDate < today) {
+            return res.status(400).json({
+                success: false,
+                message: 'Cannot book for past dates'
+            });
+        }
+
+        // Check for conflicting bookings
+        const conflictingBookings = await Booking.find({
+            court: courtId,
+            date: {
+                $gte: new Date(bookingDate.setHours(0, 0, 0, 0)),
+                $lt: new Date(bookingDate.setHours(23, 59, 59, 999))
+            },
+            bookingStatus: { $ne: 'cancelled' }
+        });
+
+        // Check for time slot conflicts
+        for (let requestedSlot of timeSlots) {
+            for (let existingBooking of conflictingBookings) {
+                for (let existingSlot of existingBooking.timeSlots) {
+                    if (
+                        (requestedSlot.startTime >= existingSlot.startTime && requestedSlot.startTime < existingSlot.endTime) ||
+                        (requestedSlot.endTime > existingSlot.startTime && requestedSlot.endTime <= existingSlot.endTime) ||
+                        (requestedSlot.startTime <= existingSlot.startTime && requestedSlot.endTime >= existingSlot.endTime)
+                    ) {
+                        return res.status(409).json({
+                            success: false,
+                            message: `Time slot ${requestedSlot.startTime}-${requestedSlot.endTime} is already booked`
+                        });
+                    }
+                }
+            }
+        }
+
+        console.log(timeSlots);
+        // Calculate total amount
+        const totalHours = timeSlots.reduce((total, slot) => {
+            const start = new Date(`2000-01-01T${slot.startTime}`);
+            const end = new Date(`2000-01-01T${slot.endTime}`);
+            return total + (end - start) / (1000 * 60 * 60);
+        }, 0);
+
+        const totalAmount = totalHours * court.pricePerHour;
+
+        // Create booking
+        const booking = await Booking.create({
+            user: req.user.id,
+            court: courtId,
+            venue: venueId,
+            date: bookingDate,
+            timeSlots,
+            totalAmount,
+            paymentMethod,
+            transactionId,
+            paymentStatus: 'paid', // Assuming payment is processed
+            bookingStatus: 'confirmed'
+        });
+
+        // Populate booking data for response
+        await booking.populate([
+            { path: 'court', select: 'name sport pricePerHour' },
+            { path: 'venue', select: 'name address' }
+        ]);
+
+        res.status(201).json({
+            success: true,
+            message: 'Booking created successfully',
+            data: booking
+        });
+    } catch (error) {
+        console.error('Create booking error:', error);
+
+        if (error.name === 'ValidationError') {
+            return res.status(400).json({
+                success: false,
+                message: 'Validation error',
+                error: error.message
+            });
+        }
+
+        res.status(500).json({
+            success: false,
+            message: 'Server error while creating booking',
+            error: error.message
+        });
+    }
+};
+
+// @desc    Get user bookings
+// @route   GET /api/users/bookings
+// @access  Private
+exports.getUserBookings = async (req, res) => {
+    try {
+        const { status, date, page = 1, limit = 10 } = req.query;
+
+        let query = { user: req.user.id };
+
+        // Filter by status
+        if (status) {
+            query.bookingStatus = status;
+        }
+
+        // Filter by date
+        if (date) {
+            const filterDate = new Date(date);
+            query.date = {
+                $gte: new Date(filterDate.setHours(0, 0, 0, 0)),
+                $lt: new Date(filterDate.setHours(23, 59, 59, 999))
+            };
+        }
+
+        const skip = (page - 1) * limit;
+
+        const bookings = await Booking.find(query)
+            .populate('court', 'name sport')
+            .populate('venue', 'name address')
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(parseInt(limit))
+            .lean();
+
+        const totalBookings = await Booking.countDocuments(query);
+
+        // Add additional info to bookings
+        const bookingsWithDetails = bookings.map(booking => ({
+            ...booking,
+            canCancel: booking.bookingStatus === 'confirmed' && new Date(booking.date) > new Date()
+        }));
+
+        res.status(200).json({
+            success: true,
+            data: bookingsWithDetails,
+            pagination: {
+                currentPage: parseInt(page),
+                totalPages: Math.ceil(totalBookings / limit),
+                totalBookings,
+                hasNextPage: skip + parseInt(limit) < totalBookings,
+                hasPrevPage: page > 1
+            }
+        });
+    } catch (error) {
+        console.error('Get user bookings error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Server error while fetching bookings',
+            error: error.message
+        });
+    }
+};
+
+// @desc    Cancel a booking
+// @route   PUT /api/users/bookings/:id/cancel
+// @access  Private
+exports.cancelBooking = async (req, res) => {
+    try {
+        const booking = await Booking.findOne({
+            _id: req.params.id,
+            user: req.user.id
+        }).populate('court', 'name sport').populate('venue', 'name');
+
+        if (!booking) {
+            return res.status(404).json({
+                success: false,
+                message: 'Booking not found'
+            });
+        }
+
+        // Check if booking can be cancelled
+        if (booking.bookingStatus !== 'confirmed') {
+            return res.status(400).json({
+                success: false,
+                message: 'Only confirmed bookings can be cancelled'
+            });
+        }
+
+        // Check if booking date is in the future
+        if (new Date(booking.date) <= new Date()) {
+            return res.status(400).json({
+                success: false,
+                message: 'Cannot cancel bookings for past dates'
+            });
+        }
+
+        // Update booking status
+        booking.bookingStatus = 'cancelled';
+        await booking.save();
+
+        res.status(200).json({
+            success: true,
+            message: 'Booking cancelled successfully',
+            data: booking
+        });
+    } catch (error) {
+        console.error('Cancel booking error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Server error while cancelling booking',
+            error: error.message
+        });
+    }
+};
+
+// @desc    Add review for a venue
+// @route   POST /api/users/venues/:venueId/reviews
+// @access  Private
+exports.addReview = async (req, res) => {
+    try {
+        const { rating, comment } = req.body;
+        const { venueId } = req.params;
+
+        // Validate input
+        if (!rating || rating < 1 || rating > 5) {
+            return res.status(400).json({
+                success: false,
+                message: 'Rating is required and must be between 1 and 5'
+            });
+        }
+
+        // Check if venue exists and is approved
+        const venue = await Venue.findOne({ _id: venueId, status: 'approved' });
+        if (!venue) {
+            return res.status(404).json({
+                success: false,
+                message: 'Venue not found or not approved'
+            });
+        }
+
+        // Check if user has booked this venue
+        const hasBooking = await Booking.findOne({
+            user: req.user.id,
+            venue: venueId,
+            bookingStatus: 'completed'
+        });
+
+        if (!hasBooking) {
+            return res.status(400).json({
+                success: false,
+                message: 'You can only review venues where you have completed bookings'
+            });
+        }
+
+        // Create review
+        const review = await Review.create({
+            user: req.user.id,
+            venue: venueId,
+            rating,
+            comment
+        });
+
+        await review.populate('user', 'fullName avatar');
+
+        res.status(201).json({
+            success: true,
+            message: 'Review added successfully',
+            data: review
+        });
+    } catch (error) {
+        console.error('Add review error:', error);
+
+        if (error.code === 11000) {
+            return res.status(400).json({
+                success: false,
+                message: 'You have already reviewed this venue'
+            });
+        }
+
+        res.status(500).json({
+            success: false,
+            message: 'Server error while adding review',
+            error: error.message
+        });
+    }
+};
