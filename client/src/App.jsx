@@ -1,21 +1,72 @@
-import React from 'react';
+import React, { useEffect, useState, createContext } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import toast, { Toaster } from 'react-hot-toast';
+
+import Header from './components/Header';
+// import Footer from './components/Footer';
+
 import Home from './pages/Home';
-import Login from './pages/Login';
 import Allvenue from './pages/Allvenue';
 import VenueDetails from './pages/VenueDetails';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import Verify from './pages/Verify';
+import ForgotPassword from './pages/ForgotPassword';
 
-const App = () => {
+import { fetchDataFromApi } from './utils/api';
+
+const MyContext = createContext();
+
+function App() {
+  const [isLogin, setIsLogin] = useState(false);
+  const [userData, setUserData] = useState(null);
+
+  useEffect(() => {
+    const token = localStorage.getItem('accesstoken');
+    if (token) {
+      setIsLogin(true);
+      fetchDataFromApi('/api/user/user-details').then((res) => {
+        setUserData(res.data);
+      });
+    } else {
+      setIsLogin(false);
+    }
+  }, [isLogin]);
+
+  const openAlertBox = (status, msg) => {
+    if (status === 'success') toast.success(msg);
+    if (status === 'error') toast.error(msg);
+  };
+
+  const values = {
+    openAlertBox,
+    isLogin,
+    setIsLogin,
+    setUserData,
+    userData,
+  };
+
   return (
-    <BrowserRouter>
-    <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/allvenue" element={<Allvenue />} />
-      <Route path="/venuedetails" element={<VenueDetails />} />
-      <Route path="/login" element={<Login />} />
-    </Routes>
-    </BrowserRouter>
+    <div>
+      <BrowserRouter>
+        <MyContext.Provider value={values}>
+          <Header />
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/allvenue" element={<Allvenue />} />
+            <Route path="/venuedetails" element={<VenueDetails />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/verify" element={<Verify />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+          </Routes>
+          {/* <Footer /> */}
+        </MyContext.Provider>
+      </BrowserRouter>
+      <Toaster />
+    </div>
   );
 }
 
 export default App;
+export { MyContext };
