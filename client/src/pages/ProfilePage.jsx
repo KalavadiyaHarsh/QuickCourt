@@ -1,20 +1,49 @@
 // src/pages/ProfilePage.jsx
-import React, { useState } from "react";
-import ProfileSidebar from "../components/ProfileSidebar"; // adjust path
-import AllBookings from "../components/AllBookings";     // adjust path
-import EditProfile from "../components/EditProfile";     // adjust path
+import React, { useState, useEffect, useContext } from "react";
+import ProfileSidebar from "../components/ProfileSidebar";
+import AllBookings from "../components/AllBookings";
+import EditProfile from "../components/EditProfile";
+import { MyContext } from "../App";
+import { fetchDataFromApi } from "../utils/api";
 
 export default function ProfilePage() {
-  const [selectedOption, setSelectedOption] = useState("bookings"); // "edit" or "bookings"
+  const [selectedOption, setSelectedOption] = useState("bookings");
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  
+  const context = useContext(MyContext);
 
-  // keep user as state so EditProfile can update it
-  const initialUser = {
-    name: "John Doe",
-    email: "john@example.com",
-    phone: "+91 9876543210",
-    photo: "man.png",
-  };
-  const [user, setUser] = useState(initialUser);
+  // Fetch user profile data from API
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        setLoading(true);
+        const response = await fetchDataFromApi("/api/users/profile");
+        
+        if (response?.success) {
+          setUser(response.data);
+          // Update context with fresh user data
+          if (context.setUserData) {
+            context.setUserData(response.data);
+          }
+          // Update localStorage with fresh user data
+          localStorage.setItem("userData", JSON.stringify(response.data));
+        } else {
+          setError(response?.message || "Failed to fetch profile");
+          context.openAlertBox("error", response?.message || "Failed to fetch profile");
+        }
+      } catch (error) {
+        console.error("Error fetching profile:", error);
+        setError("Failed to fetch profile data");
+        context.openAlertBox("error", "Failed to fetch profile data");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserProfile();
+  }, []); // Remove context dependency to prevent infinite reloading
 
   // bookings state (you can replace with real data later)
   const [bookings, setBookings] = useState([
@@ -52,14 +81,77 @@ export default function ProfilePage() {
   // save profile handler
   const handleSaveProfile = (updatedUser) => {
     setUser(updatedUser);
-    // optional: toast or alert
-    alert("Profile saved");
+    // Update context and localStorage
+    if (context.setUserData) {
+      context.setUserData(updatedUser);
+    }
+    localStorage.setItem("userData", JSON.stringify(updatedUser));
+    context.openAlertBox("success", "Profile updated successfully!");
   };
 
   // reset profile to initial
   const handleResetProfile = () => {
-    setUser(initialUser);
+    // Fetch fresh data from API
+    const fetchUserProfile = async () => {
+      try {
+        const response = await fetchDataFromApi("/api/users/profile");
+        if (response?.success) {
+          setUser(response.data);
+          if (context.setUserData) {
+            context.setUserData(response.data);
+          }
+          localStorage.setItem("userData", JSON.stringify(response.data));
+          context.openAlertBox("success", "Profile reset to original data");
+        }
+      } catch (error) {
+        context.openAlertBox("error", "Failed to reset profile");
+      }
+    };
+    fetchUserProfile();
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-emerald-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading profile...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-emerald-50 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-600 mb-4">{error}</p>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-emerald-50 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-gray-600 mb-4">No user data available</p>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          >
+            Refresh
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-emerald-50 p-8">

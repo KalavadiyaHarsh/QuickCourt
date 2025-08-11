@@ -29,16 +29,28 @@ function App() {
   const [userData, setUserData] = useState(null);
 
   useEffect(() => {
-    const token = localStorage.getItem('accesstoken');
-    if (token) {
-      setIsLogin(true);
-      fetchDataFromApi('/api/user/user-details').then((res) => {
-        setUserData(res.data);
-      });
+    const token = localStorage.getItem('accessToken');
+    const storedUserData = localStorage.getItem('userData');
+    
+    if (token && storedUserData) {
+      try {
+        const parsedUserData = JSON.parse(storedUserData);
+        setIsLogin(true);
+        setUserData(parsedUserData);
+      } catch (error) {
+        console.error('Error parsing user data:', error);
+        // Clear invalid data
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        localStorage.removeItem('userData');
+        setIsLogin(false);
+        setUserData(null);
+      }
     } else {
       setIsLogin(false);
+      setUserData(null);
     }
-  }, [isLogin]);
+  }, []);
 
   const openAlertBox = (status, msg) => {
     if (status === 'success') toast.success(msg);
