@@ -14,6 +14,10 @@ import Verify from './pages/Verify';
 import ForgotPassword from './pages/ForgotPassword';
 import ProfilePage from './pages/ProfilePage';
 import VenueBookingPage from './pages/VenueBookingPage';
+import FacilityOwnerDashboard from './pages/FacilityOwnerDashboard';
+import CourtManagement from './pages/CourtManagement';
+import FacilityManagement from './pages/FacilityManagement'
+
 
 import { fetchDataFromApi } from './utils/api';
 
@@ -63,6 +67,9 @@ function App() {
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/venue" element={<VenueBookingPage />} />
+            <Route path="/Owner" element={<FacilityOwnerDashboard />} />
+            <Route path="/facility-management" element={<FacilityManagement />} />
+            <Route path="/court-management" element={<CourtManagement />} />
           </Routes>
           {/* <Footer /> */}
         </MyContext.Provider>
