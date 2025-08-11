@@ -1,10 +1,16 @@
 import React from 'react';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import Home from './pages/Home';
+import Login from './pages/Login';
 
 const App = () => {
   return (
-    <div className='bg-red-500 w-full h-screen flex items-center justify-center'>
-      hill  harsh
-    </div>
+    <BrowserRouter>
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="/login" element={<Login />} />
+    </Routes>
+    </BrowserRouter>
   );
 }
 
