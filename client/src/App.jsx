@@ -1,20 +1,76 @@
-import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import HomePage from "./pages/HomePage";
+import React, { useEffect, useState, createContext } from 'react';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import toast, { Toaster } from 'react-hot-toast';
 
-import ProfilePage from "./pages/ProfilePage";
-import VenueBookingPage from "./pages/VenueBookingPage";
+import Header from './components/Header';
+// import Footer from './components/Footer';
+
+import Home from './pages/Home';
+import Allvenue from './pages/Allvenue';
+import VenueDetails from './pages/VenueDetails';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import Verify from './pages/Verify';
+import ForgotPassword from './pages/ForgotPassword';
+import ProfilePage from './pages/ProfilePage';
+import VenueBookingPage from './pages/VenueBookingPage';
+
+import { fetchDataFromApi } from './utils/api';
+
+const MyContext = createContext();
 
 function App() {
+  const [isLogin, setIsLogin] = useState(false);
+  const [userData, setUserData] = useState(null);
+
+  useEffect(() => {
+    const token = localStorage.getItem('accesstoken');
+    if (token) {
+      setIsLogin(true);
+      fetchDataFromApi('/api/user/user-details').then((res) => {
+        setUserData(res.data);
+      });
+    } else {
+      setIsLogin(false);
+    }
+  }, [isLogin]);
+
+  const openAlertBox = (status, msg) => {
+    if (status === 'success') toast.success(msg);
+    if (status === 'error') toast.error(msg);
+  };
+
+  const values = {
+    openAlertBox,
+    isLogin,
+    setIsLogin,
+    setUserData,
+    userData,
+  };
+
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/profile" element={<ProfilePage />} />
-        <Route path="/venue" element={< VenueBookingPage />} />
-      </Routes>
-    </Router>
+    <div>
+      <BrowserRouter>
+        <MyContext.Provider value={values}>
+          <Header />
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/allvenue" element={<Allvenue />} />
+            <Route path="/venuedetails" element={<VenueDetails />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/verify" element={<Verify />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/venue" element={<VenueBookingPage />} />
+          </Routes>
+          {/* <Footer /> */}
+        </MyContext.Provider>
+      </BrowserRouter>
+      <Toaster />
+    </div>
   );
 }
 
 export default App;
+export { MyContext };
