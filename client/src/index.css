@@ -2,6 +2,52 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Custom range slider styling for pricing */
+.slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 10px;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, #34d399 0%, #10b981 50%, #059669 100%);
+  outline: none;
+  box-shadow: inset 0 2px 6px rgba(0,0,0,0.15);
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 9999px;
+  background: radial-gradient(circle at 30% 30%, #ffffff 0%, #f0fdf4 40%, #10b981 41%, #059669 100%);
+  border: 2px solid rgba(0,0,0,0.15);
+  cursor: pointer;
+  box-shadow: 0 6px 12px rgba(16,185,129,0.4);
+}
+
+.slider::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 9999px;
+  background: radial-gradient(circle at 30% 30%, #ffffff 0%, #f0fdf4 40%, #10b981 41%, #059669 100%);
+  border: 2px solid rgba(0,0,0,0.15);
+  cursor: pointer;
+  box-shadow: 0 6px 12px rgba(16,185,129,0.4);
+}
+
+.slider::-moz-range-track {
+  height: 10px;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, #34d399 0%, #10b981 50%, #059669 100%);
+  box-shadow: inset 0 2px 6px rgba(0,0,0,0.15);
+}
+
+.slider:focus {
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(16,185,129,0.2);
+}
+
 .h-64{
     height: 30rem;
 }
@@ -413,3 +459,8 @@ button .MuiCircularProgress-root {
     max-width: 700px !important;
 }
 
+.my-box {
+  width: 300px;       /* fixed width */
+  height: 200px;      /* fixed height */
+  overflow: auto;     /* scroll instead of resize */
+}

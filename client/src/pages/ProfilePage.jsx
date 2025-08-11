@@ -62,40 +62,36 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Top Nav */}
-      <header className="flex justify-between items-center bg-gradient-to-r from-teal-600 to-blue-700 text-white px-6 py-3 shadow-md">
-        <div className="font-bold text-lg cursor-pointer">QuickCourt</div>
-        <div className="text-lg font-semibold">Booking Log</div>
-        <div className="flex items-center space-x-3">
-          <span>{user.name}</span>
-          <img src={user.photo} alt="User" className="w-10 h-10 rounded-full border-2 border-white" />
-        </div>
-      </header>
-
-      <div className="flex flex-col md:flex-row">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-emerald-50 p-8">
+      <div className="flex flex-col lg:flex-row gap-8 max-w-7xl mx-auto">
         {/* Sidebar (left) */}
-        <ProfileSidebar
-          user={user}
-          selectedOption={selectedOption}
-          setSelectedOption={setSelectedOption}
-        />
+        <div className="lg:w-1/3">
+          <ProfileSidebar
+            user={user}
+            selectedOption={selectedOption}
+            setSelectedOption={setSelectedOption}
+          />
+        </div>
 
         {/* Right content */}
-        <main className="flex-1 p-6">
-          {selectedOption === "bookings" ? (
-            <AllBookings
-              bookings={bookings}
-              onCancelBooking={handleCancelBooking}
-            />
-          ) : (
-            <EditProfile
-              user={user}
-              onSave={handleSaveProfile}
-              onReset={handleResetProfile}
-            />
-          )}
-        </main>
+        <div className="lg:w-2/3">
+          <div className="bg-white/90 backdrop-blur-md rounded-2xl shadow-2xl border border-white/20 overflow-hidden">
+            <div className="p-8">
+              {selectedOption === "bookings" ? (
+                <AllBookings
+                  bookings={bookings}
+                  onCancelBooking={handleCancelBooking}
+                />
+              ) : (
+                <EditProfile
+                  user={user}
+                  onSave={handleSaveProfile}
+                  onReset={handleResetProfile}
+                />
+              )}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

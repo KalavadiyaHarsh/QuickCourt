@@ -3,16 +3,14 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 const VenueBookingPage = () => {
-  // Example court info
   const court = {
     name: "Sunrise Tennis Court",
     sport: "Tennis",
     address: "123 Sports Avenue, City",
     rating: 4.8,
-    hourlyRate: 500, // ₹ per hour
+    hourlyRate: 500,
   };
 
-  // State
   const [startDate, setStartDate] = useState(null);
   const [startTime, setStartTime] = useState(null);
   const [duration, setDuration] = useState(1);
@@ -30,122 +28,136 @@ const VenueBookingPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      {/* Top Navbar (updated to match screenshot) */}
-      <div className="bg-gradient-to-r from-green-500 via-blue-500 to-blue-600 text-white px-6 py-3 flex justify-between items-center shadow-md">
-        <div className="font-bold text-lg">QuickCourt</div>
-        <div className="font-medium">Booking Log</div>
-        <div className="flex items-center gap-2">
-          <span>John Doe</span>
-          <img
-            src="man.png"
-            alt="User"
-            className="w-10 h-10 rounded-full border-2 border-white"
-          />
-        </div>
-      </div>
-
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-emerald-50 p-6 md:p-10">
       {/* Court Info */}
-      <div className="max-w-4xl mx-auto mt-6 bg-white p-6 rounded-xl shadow-md">
-        <h2 className="text-2xl font-bold">{court.name}</h2>
-        <p className="text-gray-600">
-          {court.sport} · {court.address}
-        </p>
-        <p className="mt-2 text-yellow-500">⭐ {court.rating}</p>
+      <div className="max-w-4xl mx-auto mb-8">
+        <div className="bg-white/90 backdrop-blur-md rounded-2xl shadow-xl p-6 md:p-8 border border-white/20">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              {court.name}
+            </h2>
+            <div className="flex items-center gap-2 bg-yellow-100 px-3 py-1.5 rounded-full">
+              <span className="text-yellow-600 font-semibold text-sm md:text-base">⭐ {court.rating}</span>
+            </div>
+          </div>
+          <p className="text-gray-600 text-base md:text-lg mb-2">
+            {court.sport} • {court.address}
+          </p>
+          <div>
+            <span className="text-green-600 font-bold text-lg md:text-xl">
+              ₹{court.hourlyRate} / hour
+            </span>
+          </div>
+        </div>
       </div>
 
       {/* Booking Form */}
-      <div className="max-w-4xl mx-auto mt-6 bg-white p-6 rounded-xl shadow-md space-y-4">
-        {/* Sport */}
-        <div>
-          <label className="block font-semibold">Sport</label>
-          <input
-            type="text"
-            value={court.sport}
-            readOnly
-            className="mt-1 w-full border p-2 rounded-lg bg-gray-100"
-          />
-        </div>
+      <div className="max-w-4xl mx-auto">
+        <div className="bg-white/90 backdrop-blur-md rounded-2xl shadow-xl p-6 md:p-8 border border-white/20 space-y-6">
+          <h3 className="text-xl md:text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            Book Your Session
+          </h3>
 
-        {/* Date Picker */}
-        <div>
-          <label className="block font-semibold">Select Date</label>
-          <DatePicker
-            selected={startDate}
-            onChange={(date) => setStartDate(date)}
-            dateFormat="dd/MM/yyyy"
-            className="mt-1 w-full border p-2 rounded-lg"
-            placeholderText="Choose a date"
-          />
-        </div>
-
-        {/* Time Picker */}
-        <div>
-          <label className="block font-semibold">Start Time</label>
-          <DatePicker
-            selected={startTime}
-            onChange={(time) => setStartTime(time)}
-            showTimeSelect
-            showTimeSelectOnly
-            timeIntervals={30}
-            timeCaption="Time"
-            dateFormat="h:mm aa"
-            className="mt-1 w-full border p-2 rounded-lg"
-            placeholderText="Select time"
-          />
-        </div>
-
-        {/* Duration */}
-        <div>
-          <label className="block font-semibold">Duration (hours)</label>
-          <div className="flex items-center gap-3 mt-1">
-            <button
-              type="button"
-              onClick={() => setDuration((d) => Math.max(1, d - 1))}
-              className="px-3 py-1 bg-gray-200 rounded-lg"
-            >
-              –
-            </button>
-            <span className="text-lg font-bold">{duration}</span>
-            <button
-              type="button"
-              onClick={() => setDuration((d) => d + 1)}
-              className="px-3 py-1 bg-gray-200 rounded-lg"
-            >
-              +
-            </button>
+          {/* Sport */}
+          <div className="space-y-1">
+            <label className="block font-medium text-gray-700 text-lg">Sport</label>
+            <input
+              type="text"
+              value={court.sport}
+              readOnly
+              className="w-full p-3 md:p-4 border-2 border-gray-200 rounded-xl bg-gray-50 text-base text-gray-700"
+            />
           </div>
-        </div>
 
-        {/* Court Selection */}
-        <div>
-          <label className="block font-semibold">Select Court</label>
-          <div className="flex flex-wrap gap-3 mt-1">
-            {courtsList.map((c) => (
+          {/* Date Picker */}
+          <div className="space-y-1">
+            <label className="block font-medium text-gray-700 text-lg">Select Date</label>
+            <DatePicker
+              selected={startDate}
+              onChange={(date) => setStartDate(date)}
+              dateFormat="dd/MM/yyyy"
+              className="w-full p-3 md:p-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 text-base"
+              placeholderText="Choose a date"
+            />
+          </div>
+
+          {/* Time Picker */}
+          <div className="space-y-1">
+            <label className="block font-medium text-gray-700 text-lg">Start Time</label>
+            <DatePicker
+              selected={startTime}
+              onChange={(time) => setStartTime(time)}
+              showTimeSelect
+              showTimeSelectOnly
+              timeIntervals={30}
+              timeCaption="Time"
+              dateFormat="h:mm aa"
+              className="w-full p-3 md:p-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 text-base"
+              placeholderText="Select time"
+            />
+          </div>
+
+          {/* Duration */}
+          <div className="space-y-1">
+            <label className="block font-medium text-gray-700 text-lg">Duration (hours)</label>
+            <div className="flex items-center gap-4 p-3 bg-gray-50 rounded-xl">
               <button
-                key={c}
                 type="button"
-                onClick={() => toggleCourtSelection(c)}
-                className={`px-4 py-2 rounded-lg border ${
-                  selectedCourts.includes(c)
-                    ? "bg-blue-500 text-white"
-                    : "bg-gray-100"
-                }`}
+                onClick={() => setDuration((d) => Math.max(1, d - 1))}
+                className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl shadow-md hover:shadow-lg transition-all transform hover:scale-105 font-bold text-lg md:text-xl"
               >
-                {c}
+                –
               </button>
-            ))}
+              <span className="text-lg md:text-2xl font-bold text-gray-800 min-w-[2.5rem] text-center">
+                {duration}
+              </span>
+              <button
+                type="button"
+                onClick={() => setDuration((d) => d + 1)}
+                className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl shadow-md hover:shadow-lg transition-all transform hover:scale-105 font-bold text-lg md:text-xl"
+              >
+                +
+              </button>
+            </div>
           </div>
-        </div>
 
-        {/* Total Price */}
-        <div className="text-xl font-bold text-right">Total: ₹{totalPrice}</div>
+          {/* Court Selection */}
+          <div className="space-y-1">
+            <label className="block font-medium text-gray-700 text-lg">Select Court</label>
+            <div className="flex flex-wrap gap-3">
+              {courtsList.map((c) => (
+                <button
+                  key={c}
+                  type="button"
+                  onClick={() => toggleCourtSelection(c)}
+                  className={`px-5 py-2.5 md:px-6 md:py-3 rounded-xl border-2 transition-all transform hover:scale-105 font-medium text-base ${
+                    selectedCourts.includes(c)
+                      ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white border-blue-500 shadow-lg"
+                      : "bg-white text-gray-700 border-gray-200 hover:border-blue-300 shadow-md"
+                  }`}
+                >
+                  {c}
+                </button>
+              ))}
+            </div>
+          </div>
 
-        {/* Book Button */}
-        <div className="text-right">
-          <button className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
-            Book Now
-          </button>
+          {/* Total Price */}
+          <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-4 md:p-6 rounded-xl border border-blue-200">
+            <div className="text-lg md:text-2xl font-bold text-right text-gray-800">
+              Total:{" "}
+              <span className="bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+                ₹{totalPrice}
+              </span>
+            </div>
+          </div>
+
+          {/* Book Button */}
+          <div className="text-right pt-2">
+            <button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 md:px-8 md:py-4 rounded-xl hover:shadow-2xl transition-all transform hover:scale-105 font-bold text-lg shadow-lg">
+              Book Now
+            </button>
+          </div>
         </div>
       </div>
     </div>

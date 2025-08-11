@@ -2,8 +2,7 @@ import React, { useEffect, useState, createContext } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import toast, { Toaster } from 'react-hot-toast';
 
-import Header from './components/Header';
-// import Footer from './components/Footer';
+import Layout from './components/Layout';
 
 import Home from './pages/Home';
 import Allvenue from './pages/Allvenue';
@@ -17,6 +16,7 @@ import VenueBookingPage from './pages/VenueBookingPage';
 import FacilityOwnerDashboard from './pages/FacilityOwnerDashboard';
 import CourtManagement from './pages/CourtManagement';
 import FacilityManagement from './pages/FacilityManagement'
+import NewBookingPage from './pages/NewBookingPage';
 
 
 import { fetchDataFromApi } from './utils/api';
@@ -56,22 +56,28 @@ function App() {
     <div>
       <BrowserRouter>
         <MyContext.Provider value={values}>
-          <Header />
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/allvenue" element={<Allvenue />} />
-            <Route path="/venuedetails" element={<VenueDetails />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/verify" element={<Verify />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/profile" element={<ProfilePage />} />
-            <Route path="/venue" element={<VenueBookingPage />} />
-            <Route path="/Owner" element={<FacilityOwnerDashboard />} />
-            <Route path="/facility-management" element={<FacilityManagement />} />
-            <Route path="/court-management" element={<CourtManagement />} />
-          </Routes>
-          {/* <Footer /> */}
+<Layout>
+  <Header />
+  <Routes>
+    <Route path="/" element={<Home />} />
+    <Route path="/allvenue" element={<Allvenue />} />
+    <Route path="/venuedetails" element={<VenueDetails />} />
+    <Route path="/login" element={<Login />} />
+    <Route path="/register" element={<Register />} />
+    <Route path="/verify" element={<Verify />} />
+    <Route path="/forgot-password" element={<ForgotPassword />} />
+    <Route path="/profile" element={<ProfilePage />} />
+    <Route path="/venue" element={<VenueBookingPage />} />
+    <Route path="/Owner" element={<FacilityOwnerDashboard />} />
+    <Route path="/facility-management" element={<FacilityManagement />} />
+    <Route path="/court-management" element={<CourtManagement />} />
+    {/* Additional Routes */}
+    <Route path="/booking" element={<NewBookingPage />} />
+    <Route path="/about" element={<div className='p-6'>About VenueBooking</div>} />
+    <Route path="/contact" element={<div className='p-6'>Contact us</div>} />
+  </Routes>
+</Layout>
+
         </MyContext.Provider>
       </BrowserRouter>
       <Toaster />
