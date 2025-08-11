@@ -62,30 +62,36 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="flex flex-col md:flex-row">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-emerald-50 p-8">
+      <div className="flex flex-col lg:flex-row gap-8 max-w-7xl mx-auto">
         {/* Sidebar (left) */}
-        <ProfileSidebar
-          user={user}
-          selectedOption={selectedOption}
-          setSelectedOption={setSelectedOption}
-        />
+        <div className="lg:w-1/3">
+          <ProfileSidebar
+            user={user}
+            selectedOption={selectedOption}
+            setSelectedOption={setSelectedOption}
+          />
+        </div>
 
         {/* Right content */}
-        <main className="flex-1 p-6">
-          {selectedOption === "bookings" ? (
-            <AllBookings
-              bookings={bookings}
-              onCancelBooking={handleCancelBooking}
-            />
-          ) : (
-            <EditProfile
-              user={user}
-              onSave={handleSaveProfile}
-              onReset={handleResetProfile}
-            />
-          )}
-        </main>
+        <div className="lg:w-2/3">
+          <div className="bg-white/90 backdrop-blur-md rounded-2xl shadow-2xl border border-white/20 overflow-hidden">
+            <div className="p-8">
+              {selectedOption === "bookings" ? (
+                <AllBookings
+                  bookings={bookings}
+                  onCancelBooking={handleCancelBooking}
+                />
+              ) : (
+                <EditProfile
+                  user={user}
+                  onSave={handleSaveProfile}
+                  onReset={handleResetProfile}
+                />
+              )}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
