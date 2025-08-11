@@ -9,6 +9,7 @@ const authRoutes = require('./route/auth.routes');
 const userRoutes = require('./route/user.routes');
 const homeRoutes = require('./route/home.routes');
 const adminRoutes = require('./route/admin.routes');
+const facilityOwnerRoutes = require('./route/facilityOwner.routes');
 
 // const venueRoutes = require('./route/venues');
 // const bookingRoutes = require('./route/bookings');
@@ -17,12 +18,21 @@ const adminRoutes = require('./route/admin.routes');
 const app = express();
 
 // Database connection
+console.log('Attempting to connect to MongoDB...');
+console.log('MongoDB URL:', process.env.MONGODB_URL ? 'Set' : 'Not set');
+
 mongoose.connect(process.env.MONGODB_URL, {
     useNewUrlParser: true,
     useUnifiedTopology: true
 })
-    .then(() => console.log('Connected to MongoDB'))
-    .catch(err => console.error('MongoDB connection error:', err));
+    .then(() => {
+        console.log('✅ Connected to MongoDB successfully');
+        console.log('Database:', mongoose.connection.name);
+    })
+    .catch(err => {
+        console.error('❌ MongoDB connection error:', err);
+        console.error('Please check your MONGODB_URL environment variable');
+    });
 
 // Middleware
 app.use(cors());
@@ -31,14 +41,26 @@ app.use(express.urlencoded({ extended: true }));
 
 // Static files
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Routes
+console.log('Registering routes...');
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/home', homeRoutes);
-app.use('/api/admin', adminRoutes);
-// app.use('/api/venues', venueRoutes);
-// app.use('/api/bookings', bookingRoutes);
+app.use('/admin', adminRoutes);
+app.use('/api/facility-owner', facilityOwnerRoutes);
+console.log('✅ All routes registered successfully');
+
+// Test endpoint to verify server is working
+app.get('/test', (req, res) => {
+    res.json({ 
+        success: true, 
+        message: 'Server is working!',
+        routes: ['/api/auth', '/api/users', '/api/home', '/admin', '/api/facility-owner'],
+        timestamp: new Date().toISOString()
+    });
+});
 
 // Health check endpoint
 app.get('/health', (req, res) => {
@@ -64,7 +86,7 @@ app.use((err, req, res, next) => {
 });
 
 // Start server
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => {
     console.log(`🚀 QuickCourt Server running on port ${PORT}`);
     console.log(`📍 Health check: http://localhost:${PORT}/health`);

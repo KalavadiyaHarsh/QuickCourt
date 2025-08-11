@@ -9,14 +9,15 @@ const venueSchema = new mongoose.Schema({
     },
     description: {
         type: String,
-        required: [true, 'Please add a description'],
+        required: false,
+        default: '',
         maxlength: [500, 'Description cannot be more than 500 characters']
     },
     address: {
-        street: { type: String, required: true },
+        street: { type: String, required: false, default: '' },
         city: { type: String, required: true },
         state: { type: String, required: true },
-        zip: { type: String, required: true },
+        zip: { type: String, required: false, default: '' },
         coordinates: {
             type: [Number], // [longitude, latitude]
             index: '2dsphere'
@@ -26,12 +27,18 @@ const venueSchema = new mongoose.Schema({
         type: [String],
         default: []
     },
-    amenities: {
+    sportsAvailable: {
         type: [String],
         enum: [
-            'parking', 'showers', 'lockers',
-            'cafeteria', 'wifi', 'equipment-rental'
+            'badminton', 'tennis', 'table-tennis',
+            'basketball', 'football', 'volleyball',
+            'squash', 'cricket'
         ],
+        required: [true, 'Please specify at least one sport'],
+        default: []
+    },
+    amenities: {
+        type: [String],
         default: []
     },
     owner: {

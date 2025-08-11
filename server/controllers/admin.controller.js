@@ -21,11 +21,12 @@ const getAdminDashboard = async (req, res) => {
             .limit(5)
             .select('fullName email role status createdAt');
 
-        // Get recent venues
-        const recentVenues = await Venue.find()
+        // Get pending venues for approval
+        const pendingVenues = await Venue.find({ status: 'pending' })
+            .populate('owner', 'fullName email')
             .sort({ createdAt: -1 })
             .limit(5)
-            .select('name address status createdAt');
+            .select('name address status createdAt owner');
 
         // Get recent bookings
         const recentBookings = await Booking.find()
@@ -53,6 +54,16 @@ const getAdminDashboard = async (req, res) => {
             { $group: { _id: null, total: { $sum: '$totalAmount' } } }
         ]);
 
+        // Get user statistics by role
+        const userStats = await User.aggregate([
+            { $group: { _id: '$role', count: { $sum: 1 } } }
+        ]);
+
+        // Get venue statistics by status
+        const venueStats = await Venue.aggregate([
+            { $group: { _id: '$status', count: { $sum: 1 } } }
+        ]);
+
         res.json({
             success: true,
             data: {
@@ -64,8 +75,10 @@ const getAdminDashboard = async (req, res) => {
                     totalRevenue: totalRevenue[0]?.total || 0,
                     monthlyRevenue: monthlyRevenue[0]?.total || 0
                 },
+                userStats,
+                venueStats,
                 recentUsers,
-                recentVenues,
+                pendingVenues,
                 recentBookings
             }
         });
@@ -82,44 +95,13 @@ const getAdminDashboard = async (req, res) => {
 // Get all users (admin only)
 const getAllUsers = async (req, res) => {
     try {
-        // Role check is handled by middleware
-        const { page = 1, limit = 10, search = '', role = '', status = '' } = req.query;
-
-        // Build query
-        let query = {};
-        if (search) {
-            query.$or = [
-                { fullName: { $regex: search, $options: 'i' } },
-                { email: { $regex: search, $options: 'i' } }
-            ];
-        }
-        if (role && role !== 'all') {
-            query.role = role;
-        }
-        if (status && status !== 'all') {
-            query.status = status;
-        }
-
-        const skip = (page - 1) * limit;
-
-        const users = await User.find(query)
+        const users = await User.find()
             .select('-password')
-            .sort({ createdAt: -1 })
-            .skip(skip)
-            .limit(parseInt(limit));
-
-        const totalUsers = await User.countDocuments(query);
+            .sort({ createdAt: -1 });
 
         res.json({
             success: true,
-            data: users,
-            pagination: {
-                currentPage: parseInt(page),
-                totalPages: Math.ceil(totalUsers / limit),
-                totalUsers,
-                hasNextPage: skip + users.length < totalUsers,
-                hasPrevPage: page > 1
-            }
+            data: users
         });
 
     } catch (error) {
@@ -134,21 +116,20 @@ const getAllUsers = async (req, res) => {
 // Update user status (admin only)
 const updateUserStatus = async (req, res) => {
     try {
-        // Role check is handled by middleware
         const { userId } = req.params;
         const { status } = req.body;
 
-        if (!['active', 'inactive', 'suspended'].includes(status)) {
+        if (!['active', 'suspended', 'pending'].includes(status)) {
             return res.status(400).json({
                 success: false,
-                message: 'Invalid status. Must be active, inactive, or suspended.'
+                message: 'Invalid status. Must be active, suspended, or pending'
             });
         }
 
         const user = await User.findByIdAndUpdate(
             userId,
             { status },
-            { new: true }
+            { new: true, runValidators: true }
         ).select('-password');
 
         if (!user) {
@@ -176,44 +157,13 @@ const updateUserStatus = async (req, res) => {
 // Get all venues (admin only)
 const getAllVenues = async (req, res) => {
     try {
-        // Role check is handled by middleware
-        const { page = 1, limit = 10, search = '', status = '', city = '' } = req.query;
-
-        // Build query
-        let query = {};
-        if (search) {
-            query.$or = [
-                { name: { $regex: search, $options: 'i' } },
-                { description: { $regex: search, $options: 'i' } }
-            ];
-        }
-        if (status && status !== 'all') {
-            query.status = status;
-        }
-        if (city) {
-            query['address.city'] = { $regex: city, $options: 'i' };
-        }
-
-        const skip = (page - 1) * limit;
-
-        const venues = await Venue.find(query)
+        const venues = await Venue.find()
             .populate('owner', 'fullName email')
-            .sort({ createdAt: -1 })
-            .skip(skip)
-            .limit(parseInt(limit));
-
-        const totalVenues = await Venue.countDocuments(query);
+            .sort({ createdAt: -1 });
 
         res.json({
             success: true,
-            data: venues,
-            pagination: {
-                currentPage: parseInt(page),
-                totalPages: Math.ceil(totalVenues / limit),
-                totalVenues,
-                hasNextPage: skip + venues.length < totalVenues,
-                hasPrevPage: page > 1
-            }
+            data: venues
         });
 
     } catch (error) {
@@ -228,21 +178,20 @@ const getAllVenues = async (req, res) => {
 // Update venue status (admin only)
 const updateVenueStatus = async (req, res) => {
     try {
-        // Role check is handled by middleware
         const { venueId } = req.params;
         const { status } = req.body;
 
-        if (!['pending', 'approved', 'rejected'].includes(status)) {
+        if (!['approved', 'rejected', 'pending'].includes(status)) {
             return res.status(400).json({
                 success: false,
-                message: 'Invalid status. Must be pending, approved, or rejected.'
+                message: 'Invalid status. Must be approved, rejected, or pending'
             });
         }
 
         const venue = await Venue.findByIdAndUpdate(
             venueId,
             { status },
-            { new: true }
+            { new: true, runValidators: true }
         ).populate('owner', 'fullName email');
 
         if (!venue) {
@@ -270,16 +219,11 @@ const updateVenueStatus = async (req, res) => {
 // Get all bookings (admin only)
 const getAllBookings = async (req, res) => {
     try {
-        // Role check is handled by middleware
-        const { page = 1, limit = 10, status = '', paymentStatus = '' } = req.query;
+        const { page = 1, limit = 20, status = '' } = req.query;
 
-        // Build query
         let query = {};
         if (status && status !== 'all') {
             query.bookingStatus = status;
-        }
-        if (paymentStatus && paymentStatus !== 'all') {
-            query.paymentStatus = paymentStatus;
         }
 
         const skip = (page - 1) * limit;

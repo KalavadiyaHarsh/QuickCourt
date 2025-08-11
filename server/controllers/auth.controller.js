@@ -383,8 +383,7 @@ exports.refreshToken = async (req, res) => {
         }
 
         // Verify refresh token
-        const refreshSecretKey = process.env.SECRET_KEY_REFRESH_TOKEN || 'fallback_refresh_token_key_for_testing_12345';
-        const decoded = jwt.verify(refreshToken, refreshSecretKey);
+        const decoded = jwt.verify(refreshToken, process.env.SECRET_KEY_REFRESH_TOKEN);
         const user = await User.findById(decoded.id).select('+refresh_token');
 
         if (!user || user.refresh_token !== refreshToken) {
