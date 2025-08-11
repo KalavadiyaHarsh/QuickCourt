@@ -189,13 +189,18 @@ const VenueDetails = () => {
                                         <h4 className="font-semibold">{court.name}</h4>
                                         <span className="text-green-600 font-bold">₹{court.pricePerHour}/hour</span>
                                     </div>
-                                    <div className="text-sm text-gray-600">
+                                    <div className="text-sm text-gray-600 mb-3">
                                         <p>Sport: {court.sport}</p>
                                         <p>Capacity: {court.capacity} players</p>
                                         {court.operatingHours && (
                                             <p>Hours: {court.operatingHours.weekdays.open} - {court.operatingHours.weekdays.close}</p>
                                         )}
                                     </div>
+                                    <Link to={`/venue/${venue._id}/${court._id}`}>
+                                        <button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all transform hover:scale-105 font-medium">
+                                            Book This Court
+                                        </button>
+                                    </Link>
                                 </div>
                             ))}
                         </div>

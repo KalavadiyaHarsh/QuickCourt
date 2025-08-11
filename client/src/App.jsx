@@ -80,7 +80,7 @@ function App() {
               <Route path="/verify" element={<Verify />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/profile" element={<ProfilePage />} />
-              <Route path="/venue" element={<VenueBookingPage />} />
+              <Route path="/venue/:venueId/:courtId" element={<VenueBookingPage />} />
               <Route path="/Owner" element={<FacilityOwnerDashboard />} />
               <Route path="/facility-management" element={<FacilityManagement />} />
               <Route path="/court-management" element={<CourtManagement />} />

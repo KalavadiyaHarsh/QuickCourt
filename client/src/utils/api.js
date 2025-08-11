@@ -81,3 +81,26 @@ export const editData = async (url, updatedData) => {
         return { success: false, error };
     }
 }
+
+export const putData = async (url, data) => {
+    try {
+        const response = await axios.put(apiUrl + url, data, {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem("accessToken")}`,
+                'Content-Type': 'application/json',
+            },
+        });
+        return response.data;
+
+    } catch (error) {
+        console.error("Error in putData:", error);
+        if (error.response?.status === 401) {
+            // Unauthorized - clear tokens and redirect to login
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('refreshToken');
+            localStorage.removeItem('userData');
+            window.location.href = '/login';
+        }
+        return { success: false, message: error.response?.data?.message || "Request failed" };
+    }
+}
