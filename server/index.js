@@ -4,11 +4,11 @@ const mongoose = require('mongoose');
 const path = require('path');
 const cors = require('cors');
 
-
 // Import routes
 const authRoutes = require('./route/auth.routes');
 const userRoutes = require('./route/user.routes');
 const homeRoutes = require('./route/home.routes');
+const adminRoutes = require('./route/admin.routes');
 
 // const venueRoutes = require('./route/venues');
 // const bookingRoutes = require('./route/bookings');
@@ -36,6 +36,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/home', homeRoutes);
+app.use('/api/admin', adminRoutes);
 // app.use('/api/venues', venueRoutes);
 // app.use('/api/bookings', bookingRoutes);
 
