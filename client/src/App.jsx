@@ -17,6 +17,9 @@ import FacilityOwnerDashboard from './pages/FacilityOwnerDashboard';
 import CourtManagement from './pages/CourtManagement';
 import FacilityManagement from './pages/FacilityManagement'
 import NewBookingPage from './pages/NewBookingPage';
+import AdminDashboard from "./pages/AdminDashboard";
+import UserManagement from "./pages/UserManagement";
+import FacilityApproval from "./pages/FacilityApproval";
 
 
 import { fetchDataFromApi } from './utils/api';
@@ -72,10 +75,12 @@ function App() {
               <Route path="/Owner" element={<FacilityOwnerDashboard />} />
               <Route path="/facility-management" element={<FacilityManagement />} />
               <Route path="/court-management" element={<CourtManagement />} />
-              {/* Additional Routes */}
               <Route path="/booking" element={<NewBookingPage />} />
               <Route path="/about" element={<div className='p-6'>About VenueBooking</div>} />
               <Route path="/contact" element={<div className='p-6'>Contact us</div>} />
+              <Route path="/admin" element={<AdminDashboard />} />
+              <Route path="/admin/users" element={<UserManagement />} />
+              <Route path="/admin/facilities" element={<FacilityApproval />} />
             </Routes>
           </Layout>
 

@@ -29,7 +29,7 @@ const Venue = () => {
       reviews: 8,
       location: "Navrangpura",
       price: 500,
-      tags: ["football", "Outdoor"],
+      tags: ["football", "Outdoor", "Top Rated", "Budget"],
       image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQgL5G58RA18xq5Qv0v_l4H8KXFxqxxntAn6g&s",
       type: "Outdoor",
       sport: "football"
