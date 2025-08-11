@@ -21,7 +21,7 @@ const FacilityApproval = () => {
   return (
     <div className="flex">
       <Sidebar />
-      <div className="flex-1 ml-64">
+      <div className="flex-1">
         <Topbar />
         <div className="p-6">
           <h2 className="text-xl font-semibold mb-4">Facility Approval</h2>
