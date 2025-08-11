@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+.h-64{
+    height: 30rem;
+}
+
 body {
     font-family: "Montserrat", sans-serif;
     font-optical-sizing: auto;
@@ -408,3 +412,4 @@ button .MuiCircularProgress-root {
     width: 700px !important;
     max-width: 700px !important;
 }
+
