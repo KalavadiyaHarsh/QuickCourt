@@ -2,6 +2,8 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const path = require('path');
+const cors = require('cors');
+
 
 // Import routes
 const authRoutes = require('./route/auth.routes');
@@ -23,6 +25,7 @@ mongoose.connect(process.env.MONGODB_URL, {
     .catch(err => console.error('MongoDB connection error:', err));
 
 // Middleware
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
