@@ -1,6 +1,6 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
-import { FaTachometerAlt, FaBuilding, FaTableTennis, FaCalendarAlt, FaSignOutAlt } from "react-icons/fa";
+import { FaTachometerAlt, FaBuilding, FaTableTennis } from "react-icons/fa";
 
 const FacilityOwnerSidebar = () => {
   const navItems = [

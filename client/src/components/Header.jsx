@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react';
-import { FaRegUser } from "react-icons/fa";
-import { Link, useNavigate } from 'react-router-dom';
+import { FaRegUser, FaBars, FaTimes } from 'react-icons/fa';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { MyContext } from '../App';
 import { Button, Menu, MenuItem } from '@mui/material';
 import { fetchDataFromApi } from '../utils/api';
@@ -8,12 +8,16 @@ import { fetchDataFromApi } from '../utils/api';
 const Header = () => {
   const { isLogin, userData, setIsLogin, setUserData, openAlertBox } = useContext(MyContext) || {};
   const [anchorEl, setAnchorEl] = useState(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const open = Boolean(anchorEl);
+  
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
+  
   const handleClose = () => {
     setAnchorEl(null);
   };
@@ -42,78 +46,137 @@ const Header = () => {
       });
   };
 
+  const isActive = (path) => {
+    return location.pathname === path;
+  };
+
+  const navLinks = [
+    { path: '/venues', label: 'Venues' },
+    { path: '/services', label: 'Services' },
+    { path: '/about', label: 'About' },
+    { path: '/contact', label: 'Contact' }
+  ];
+
   return (
-    <header className="bg-gradient-to-r from-emerald-500 via-blue-600 to-purple-700 text-white px-6 py-4 flex justify-between items-center shadow-2xl border-b-4 border-white/20 backdrop-blur-sm relative">
-      {/* Animated background */}
-      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-pulse pointer-events-none"></div>
-      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 pointer-events-none"></div>
+    <header className="bg-white/95 backdrop-blur-md border-b border-neutral-200 sticky top-0 z-50">
+      <div className="container">
+        <div className="flex items-center justify-between h-16">
+          {/* Logo */}
+          <Link
+            to="/"
+            className="text-2xl font-bold text-primary-600 hover:text-primary-700 transition-colors"
+          >
+            QuickCourt
+          </Link>
 
-      {/* Logo */}
-      <Link
-        to="/"
-        className="text-2xl font-bold tracking-wider relative z-10 transform hover:scale-105 transition-all duration-300 drop-shadow-lg focus:outline-none focus:ring-2 focus:ring-white/50 rounded-xl"
-      >
-        <span className="bg-gradient-to-r from-white to-yellow-200 bg-clip-text text-transparent">QuickCourt</span>
-      </Link>
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex items-center gap-8">
+            {navLinks.map((link) => (
+              <Link
+                key={link.path}
+                to={link.path}
+                className={`nav-link ${isActive(link.path) ? 'active' : ''}`}
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
 
-      {/* Nav Links */}
-      <nav className="hidden md:flex items-center gap-8 relative z-10">
-        <Link to="/allvenue" className=" hover:text-yellow-200 transition-all duration-300 font-medium transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-white/40 rounded-md">
-          Venues
-        </Link>
-        
-      </nav>
+          {/* Auth Section */}
+          <div className="flex items-center gap-4">
+            {isLogin ? (
+              <>
+                <Button
+                  onClick={handleClick}
+                  aria-controls={open ? 'account-menu' : undefined}
+                  aria-haspopup="true"
+                  aria-expanded={open ? 'true' : undefined}
+                  className="!text-neutral-700 !bg-neutral-100 hover:!bg-neutral-200 !px-4 !py-2 !rounded-lg !transition-all !duration-300"
+                >
+                  <FaRegUser className="mr-2" />
+                  <span className="hidden sm:inline">{userData?.name || 'Profile'}</span>
+                </Button>
 
-      {/* Profile / Login */}
-      <div className="flex items-center gap-4 relative z-50">
-        {isLogin ? (
-          <>
-            <Button
-              onClick={handleClick}
-              aria-controls={open ? 'account-menu' : undefined}
-              aria-haspopup="true"
-              aria-expanded={open ? 'true' : undefined}
-              className="!text-white flex items-center gap-3 bg-white/15 hover:bg-white/25 backdrop-blur-md px-4 py-2 rounded-xl border border-white/20 transition-all duration-300 transform hover:scale-105 hover:shadow-xl"
-            >
-              <FaRegUser className="text-xl drop-shadow-lg" />
-              <span className="hidden sm:inline font-medium">{userData?.name || 'Profile'}</span>
-            </Button>
-
-            {/* Dropdown Menu */}
-            <Menu
-              anchorEl={anchorEl}
-              id="account-menu"
-              open={open}
-              onClose={handleClose}
-              PaperProps={{
-                sx: {
-                  mt: 1.5,
-                  borderRadius: 2,
-                  overflow: 'hidden',
-                  boxShadow: '0px 4px 20px rgba(0,0,0,0.15)',
-                },
-              }}
-              transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-              anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-            >
-              <MenuItem onClick={handleClose}>
-                <Link to="/profile" className="w-full block text-gray-800 hover:text-blue-600">
-                  Profile
+                <Menu
+                  anchorEl={anchorEl}
+                  id="account-menu"
+                  open={open}
+                  onClose={handleClose}
+                  PaperProps={{
+                    sx: {
+                      mt: 1.5,
+                      borderRadius: 2,
+                      overflow: 'hidden',
+                      boxShadow: '0px 4px 20px rgba(0,0,0,0.15)',
+                    },
+                  }}
+                  transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+                  anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+                >
+                  <MenuItem onClick={handleClose}>
+                    <Link to="/profile" className="w-full block text-neutral-800 hover:text-primary-600">
+                      Profile
+                    </Link>
+                  </MenuItem>
+                  <MenuItem onClick={handleLogout} sx={{ color: 'red' }}>
+                    Logout
+                  </MenuItem>
+                </Menu>
+              </>
+            ) : (
+              <div className="hidden md:flex items-center gap-3">
+                <Link to="/login" className="btn btn-outline btn-sm">
+                  Login
                 </Link>
-              </MenuItem>
-              <MenuItem onClick={handleLogout} sx={{ color: 'red' }}>
-                Logout
-              </MenuItem>
-            </Menu>
-          </>
-        ) : (
-          <div className="flex items-center gap-3">
-            <Link to="/login" className="bg-gradient-to-r from-white to-gray-100 text-blue-700 font-semibold px-4 py-2 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 border border-white/50">
-              Login
-            </Link>
-            <Link to="/register" className="bg-gradient-to-r from-blue-800 to-purple-800 text-white font-semibold px-4 py-2 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 border border-white/20">
-              Register
-            </Link>
+                <Link to="/register" className="btn btn-primary btn-sm">
+                  Register
+                </Link>
+              </div>
+            )}
+
+            {/* Mobile Menu Button */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="md:hidden p-2 rounded-lg hover:bg-neutral-100 transition-colors"
+            >
+              {mobileMenuOpen ? <FaTimes /> : <FaBars />}
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile Menu */}
+        {mobileMenuOpen && (
+          <div className="md:hidden border-t border-neutral-200 py-4">
+            <nav className="flex flex-col space-y-2">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.path}
+                  to={link.path}
+                  className={`nav-link ${isActive(link.path) ? 'active' : ''}`}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  {link.label}
+                </Link>
+              ))}
+              {!isLogin && (
+                <div className="flex flex-col gap-2 pt-4 border-t border-neutral-200">
+                  <Link
+                    to="/login"
+                    className="btn btn-outline w-full justify-center"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    to="/register"
+                    className="btn btn-primary w-full justify-center"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Register
+                  </Link>
+                </div>
+              )}
+            </nav>
           </div>
         )}
       </div>
