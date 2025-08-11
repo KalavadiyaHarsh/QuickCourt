@@ -7,12 +7,16 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import { Link, useParams } from "react-router-dom";
 import { fetchDataFromApi } from "../utils/api";
+import { useScrollToTop } from "../hooks/useScrollToTop";
 
 const VenueDetails = () => {
     const { id } = useParams();
     const [venue, setVenue] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+
+    // Use custom hook for scroll to top
+    useScrollToTop();
 
     // Fetch venue details from API
     useEffect(() => {

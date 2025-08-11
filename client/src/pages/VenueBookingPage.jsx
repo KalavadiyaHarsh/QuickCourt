@@ -4,6 +4,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { fetchDataFromApi, postData } from "../utils/api";
 import { FaMapMarkerAlt, FaStar, FaSpinner, FaCalendarAlt, FaClock, FaCreditCard } from "react-icons/fa";
+import { useScrollToTop } from "../hooks/useScrollToTop";
 
 const VenueBookingPage = () => {
   const { venueId, courtId } = useParams();
@@ -14,6 +15,9 @@ const VenueBookingPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [bookingLoading, setBookingLoading] = useState(false);
+
+  // Use custom hook for scroll to top
+  useScrollToTop();
 
   // Booking form state
   const [startDate, setStartDate] = useState(null);

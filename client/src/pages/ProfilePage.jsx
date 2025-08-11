@@ -5,6 +5,7 @@ import AllBookings from "../components/AllBookings";
 import EditProfile from "../components/EditProfile";
 import { MyContext } from "../App";
 import { fetchDataFromApi } from "../utils/api";
+import { useScrollToTop } from "../hooks/useScrollToTop";
 
 export default function ProfilePage() {
   const [selectedOption, setSelectedOption] = useState("bookings");
@@ -13,6 +14,9 @@ export default function ProfilePage() {
   const [error, setError] = useState(null);
   
   const context = useContext(MyContext);
+
+  // Use custom hook for scroll to top
+  useScrollToTop();
 
   // Fetch user profile data from API
   useEffect(() => {

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { FaMapMarkerAlt, FaStar, FaSearch, FaFilter, FaSpinner } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { fetchDataFromApi } from "../utils/api";
+import { useScrollToTop } from "../hooks/useScrollToTop";
 
 const Venue = () => {
   const [search, setSearch] = useState("");
@@ -19,6 +20,11 @@ const Venue = () => {
     hasNextPage: false,
     hasPrevPage: false
   });
+
+  // Use custom hook for scroll to top
+  useScrollToTop();
+  useScrollToTop([search, sportType, priceRange, rating, city]);
+  useScrollToTop([pagination.currentPage]);
 
   // Fetch venues from API
   const fetchVenues = async (page = 1) => {
