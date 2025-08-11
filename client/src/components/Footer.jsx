@@ -10,7 +10,7 @@ const Footer = () => {
       
       <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 relative z-10">
         <p className="text-sm font-medium drop-shadow-lg">
-          © 2025 <span className="bg-gradient-to-r from-yellow-200 to-orange-200 bg-clip-text text-transparent font-bold">VenueBooking</span>. All rights reserved.
+          © 2025 <span className="bg-gradient-to-r from-yellow-200 to-orange-200 bg-clip-text text-transparent font-bold">QuickCourt</span>. All rights reserved.
         </p>
         <nav className="text-sm flex items-center gap-4">
           <Link to="/" className="hover:text-yellow-200 transition-all duration-300 font-medium transform hover:scale-110">

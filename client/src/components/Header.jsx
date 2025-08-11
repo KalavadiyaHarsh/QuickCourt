@@ -59,17 +59,15 @@ const Header = () => {
         to="/"
         className="text-2xl font-bold tracking-wider relative z-10 transform hover:scale-105 transition-all duration-300 drop-shadow-lg focus:outline-none focus:ring-2 focus:ring-white/50 rounded-xl"
       >
-        <span className="bg-gradient-to-r from-white to-yellow-200 bg-clip-text text-transparent">VenueBooking</span>
+        <span className="bg-gradient-to-r from-white to-yellow-200 bg-clip-text text-transparent">QuickCourt</span>
       </Link>
 
       {/* Nav Links */}
       <nav className="hidden md:flex items-center gap-8 relative z-10">
-        <Link to="/allvenue" className="hover:underline hover:text-yellow-200 transition-all duration-300 font-medium transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-white/40 rounded-md">
+        <Link to="/allvenue" className=" hover:text-yellow-200 transition-all duration-300 font-medium transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-white/40 rounded-md">
           Venues
         </Link>
-        <Link to="/booking" className="hover:underline hover:text-yellow-200 transition-all duration-300 font-medium transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-white/40 rounded-md">
-          Book
-        </Link>
+        
       </nav>
 
       {/* Profile / Login */}

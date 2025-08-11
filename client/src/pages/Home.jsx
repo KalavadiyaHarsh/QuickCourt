@@ -374,6 +374,6 @@ const Home = () => {
       <Slider />
     </div>
   );
-}
+};
 
 export default Home;
