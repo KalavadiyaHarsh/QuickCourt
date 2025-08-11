@@ -148,7 +148,7 @@ const Header = () => {
         <Link to="/allvenue" className="hover:underline hover:text-yellow-200 transition-all duration-300 font-medium transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-white/40 rounded-md">
           Venues
         </Link>
-        <Link to="/venue" className="hover:underline hover:text-yellow-200 transition-all duration-300 font-medium transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-white/40 rounded-md">
+        <Link to="/booking" className="hover:underline hover:text-yellow-200 transition-all duration-300 font-medium transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-white/40 rounded-md">
           Book
         </Link>
       </nav>

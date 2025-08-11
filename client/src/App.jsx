@@ -13,6 +13,7 @@ import Verify from './pages/Verify';
 import ForgotPassword from './pages/ForgotPassword';
 import ProfilePage from './pages/ProfilePage';
 import VenueBookingPage from './pages/VenueBookingPage';
+import NewBookingPage from './pages/NewBookingPage';
 
 import { fetchDataFromApi } from './utils/api';
 
@@ -62,6 +63,7 @@ function App() {
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/profile" element={<ProfilePage />} />
               <Route path="/venue" element={<VenueBookingPage />} />
+              <Route path="/booking" element={<NewBookingPage />} />
               <Route path="/about" element={<div className='p-6'>About VenueBooking</div>} />
               <Route path="/contact" element={<div className='p-6'>Contact us</div>} />
             </Routes>
