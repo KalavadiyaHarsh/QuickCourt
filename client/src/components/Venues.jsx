@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { FaMapMarkerAlt, FaStar } from "react-icons/fa";
+import { Link } from "react-router-dom";
 
 const Venue = () => {
   const [search, setSearch] = useState("");
@@ -17,19 +18,19 @@ const Venue = () => {
       location: "Vaishnodevi Cir",
       price: 250,
       tags: ["badminton", "Outdoor", "Top Rated", "Budget"],
-      image: "https://via.placeholder.com/200x150",
+      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQKCe6TZjs0QRuT1RuuszyXJSuL6ne6rF50bg&s",
       type: "Outdoor",
       sport: "badminton"
     },
     {
       id: 2,
       name: "Arena Turf",
-      rating: 4.7,
+      rating: 2,
       reviews: 8,
       location: "Navrangpura",
       price: 500,
-      tags: ["football", "Outdoor", "Top Rated"],
-      image: "https://via.placeholder.com/200x150",
+      tags: ["football", "Outdoor"],
+      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQgL5G58RA18xq5Qv0v_l4H8KXFxqxxntAn6g&s",
       type: "Outdoor",
       sport: "football"
     }
@@ -185,9 +186,11 @@ const Venue = () => {
                     </span>
                   ))}
                 </div>
+                <Link to={"/venuedetails"}>
                 <button className="mt-3 w-full bg-green-500 text-white py-2 rounded hover:bg-green-600">
                   View Details
                 </button>
+                </Link>
               </div>
             </div>
           ))}
