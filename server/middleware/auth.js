@@ -1,36 +1,60 @@
-import jwt from 'jsonwebtoken'
+const jwt = require('jsonwebtoken');
+const User = require('../models/User');
 
-const auth = async(req,res,next)=>{
+const protect = async (req, res, next) => {
     try {
-        const token = req.cookies.accessToken || req?.headers?.authorization?.split(" ")[1]
+        let token;
 
-        if(!token){
-            return res.status(401).json({
-                message : "Provide token"
-            })
+        if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+            token = req.headers.authorization.split(' ')[1];
         }
 
-        const decode = await jwt.verify(token,process.env.SECRET_KEY_ACCESS_TOKEN)
-
-        if(!decode){
+        if (!token) {
             return res.status(401).json({
-                message : "unanthorized access",
-                error : true,
-                success : false
-            })
+                success: false,
+                message: 'Not authorized to access this route'
+            });
         }
 
-        req.userId = decode.id
-
-        next()
-
+        try {
+            const decoded = jwt.verify(token, process.env.SECRET_KEY_ACCESS_TOKEN);
+            req.user = await User.findById(decoded.id).select('-password');
+            next();
+        } catch (error) {
+            return res.status(401).json({
+                success: false,
+                message: 'Token is not valid'
+            });
+        }
     } catch (error) {
         return res.status(500).json({
-            message: "You have not login",
-            error: true,
-            success: false
-        })
+            success: false,
+            message: 'Server error'
+        });
     }
-}
+};
 
-export default auth
+const authorize = (...roles) => {
+    return (req, res, next) => {
+        if (!req.user) {
+            return res.status(401).json({
+                success: false,
+                message: 'User not authenticated'
+            });
+        }
+
+        if (!roles.includes(req.user.role)) {
+            return res.status(403).json({
+                success: false,
+                message: `User role '${req.user.role}' is not authorized to access this route`
+            });
+        }
+
+        next();
+    };
+};
+
+module.exports = {
+    protect,
+    authorize
+};

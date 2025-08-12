@@ -9,7 +9,7 @@ import { MyContext } from '../App'; // Assuming MyContext is exported from App.j
 import CircularProgress from '@mui/material/CircularProgress';
 import { postData } from '../utils/api';
 
-const Register = () => {
+const Login = () => {
 
     const [isLoading, setIsLoading] = useState(false)
     const [isShowPassword, setIsShowPassword] = useState(false);
@@ -21,20 +21,15 @@ const Register = () => {
     const context = useContext(MyContext);
     const history = useNavigate();
 
-
-
     const onChangeInput = (e) => {
         const { name, value } = e.target;
-        setFormFields(() => {
-            return {
-                ...formFields,
-                [name]: value
-            }
-        })
+        setFormFields(prevFields => ({
+            ...prevFields,
+            [name]: value
+        }))
     }
 
     const forgotPassword = () => {
-
         if (formFields.email === "") {
             context.openAlertBox('error', 'Please enter email id');
             return false;
@@ -54,10 +49,7 @@ const Register = () => {
                     context.openAlertBox("error", res?.message);
                 }
             })
-
-
         }
-
     }
 
     const handleSubmit = (e) => {
@@ -76,26 +68,35 @@ const Register = () => {
             setIsLoading(false);
             return;
         }
-        postData("/api/user/login", formFields).then((res) => {
-            if (res?.error !== true) {
+
+        postData("/api/auth/login", formFields).then((res) => {
+            if (res?.success === true) {
                 setIsLoading(false);
                 context.openAlertBox("success", res?.message);
-                // localStorage.setItem("userEmail",formFields.email)
+                
+                // Store user data and tokens
+                localStorage.setItem("accessToken", res?.data?.accessToken);
+                localStorage.setItem("refreshToken", res?.data?.refreshToken);
+                localStorage.setItem("userData", JSON.stringify(res?.data?.user));
+                
+                // Update context with user data
+                context.setUserData && context.setUserData(res?.data?.user);
+                
+                // Reset form fields
                 setFormFields({
-                    name: "",
                     email: "",
                     password: ""
                 })
 
-                localStorage.setItem("accesstoken", res?.data?.accesstoken);
-                localStorage.setItem("refreshToken", res?.data?.refreshToken);
-
                 history("/")
                 context.setIsLogin(true)
             } else {
-                context.openAlertBox("error", res?.message);
+                context.openAlertBox("error", res?.message || "Login failed");
                 setIsLoading(false);
             }
+        }).catch((error) => {
+            context.openAlertBox("error", "An error occurred during login");
+            setIsLoading(false);
         })
     }
 
@@ -163,4 +164,4 @@ const Register = () => {
     );
 }
 
-export default Register;
+export default Login;

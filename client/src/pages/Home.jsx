@@ -1,126 +1,253 @@
-import React, { useState } from "react";
-import { FaMapMarkerAlt, FaStar } from "react-icons/fa";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation } from "swiper/modules";
-import "swiper/css";
-import "swiper/css/navigation";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect, useRef } from 'react';
+import Slider from '../components/Slider';
+import { fetchDataFromApi } from '../utils/api';
+import { FaMapMarkerAlt, FaStar, FaSpinner, FaSearch, FaFilter } from 'react-icons/fa';
+import { Link } from 'react-router-dom';
 
 const Home = () => {
-  const [location, setLocation] = useState("");
+  const [homeData, setHomeData] = useState(null);
+  const [popularVenues, setPopularVenues] = useState([]);
+  const [sports, setSports] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  
+  // Search state
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [showSearchResults, setShowSearchResults] = useState(false);
+  
+  // Refs for click outside handling
+  const searchRef = useRef(null);
 
-  const venues = [
-    {
-      id: 1,
-      name: "SBR Badminton",
-      rating: 4.5,
-      reviews: 6,
-      location: "Vaishnodevi Cir",
-      tags: ["badminton", "Outdoor", "Top Rated", "Budget"],
-      image: "t2.jpeg",
-    },
-    {
-      id: 2,
-      name: "Arena Turf",
-      rating: 4.7,
-      reviews: 10,
-      location: "Navrangpura",
-      tags: ["football", "Outdoor", "Top Rated", "Budget"],
-      image:
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQKCe6TZjs0QRuT1RuuszyXJSuL6ne6rF50bg&s",
-    },
-    {
-      id: 3,
-      name: "Court Masters",
-      rating: 4.2,
-      reviews: 8,
-      location: "Satellite",
-      tags: ["tennis", "Indoor", "Budget"],
-      image: "t1.jpeg",
-    },
-    {
-      id: 4,
-      name: "Smash House",
-      rating: 4.9,
-      reviews: 15,
-      location: "Bopal",
-      tags: ["badminton", "Indoor", "Top Rated"],
-      image:
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQKCe6TZjs0QRuT1RuuszyXJSuL6ne6rF50bg&s",
-    },
-    {
-      id: 5,
-      name: "SBR Badminton",
-      rating: 4.5,
-      reviews: 6,
-      location: "Vaishnodevi Cir",
-      tags: ["badminton", "Outdoor", "Top Rated", "Budget"],
-      image: "t4.jpeg",
-    },
-    {
-      id: 6,
-      name: "Arena Turf",
-      rating: 4.7,
-      reviews: 10,
-      location: "Navrangpura",
-      tags: ["football", "Outdoor", "Top Rated", "Budget"],
-      image: "t3.jpeg",
-    },
-    {
-      id: 7,
-      name: "Court Masters",
-      rating: 4.2,
-      reviews: 8,
-      location: "Satellite",
-      tags: ["tennis", "Indoor", "Budget"],
-      image: "t2.jpeg",
-    },
-    {
-      id: 8,
-      name: "Smash House",
-      rating: 4.9,
-      reviews: 15,
-      location: "Bopal",
-      tags: ["badminton", "Indoor", "Top Rated"],
-      image: "t1.jpeg",
-    },
-  ];
+  // Fetch home data
+  useEffect(() => {
+    const fetchHomeData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
 
-  const sports = [
-    { name: "Badminton", image: "badminton.jpg" },
-    { name: "Football", image: "football.jpeg" },
-    { name: "Cricket", image: "cricket.jpg" },
-    { name: "Swimming", image: "t1.jpeg" },
-    { name: "Tennis", image: "tennis.jpg" },
-    { name: "Table Tennis", image: "table tennis.jpeg" },
-  ];
+        // Fetch home data
+        const homeResponse = await fetchDataFromApi('/api/home');
+        if (homeResponse?.success) {
+          setHomeData(homeResponse.data);
+        }
+
+        // Fetch popular venues
+        const popularResponse = await fetchDataFromApi('/api/users/venues/popular');
+        if (popularResponse?.success) {
+          setPopularVenues(popularResponse.data);
+        }
+
+        // Fetch sports data
+        const sportsResponse = await fetchDataFromApi('/api/home/sports');
+        if (sportsResponse?.success) {
+          setSports(sportsResponse.data);
+        }
+
+      } catch (error) {
+        console.error("Error fetching home data:", error);
+        setError("Failed to fetch home data");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchHomeData();
+  }, []);
+
+  // Click outside handler
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (searchRef.current && !searchRef.current.contains(event.target)) {
+        setShowSearchResults(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  // Search venues
+  const searchVenues = async (query) => {
+    if (!query.trim()) {
+      setSearchResults([]);
+      setShowSearchResults(false);
+      return;
+    }
+
+    setSearchLoading(true);
+    try {
+      const response = await fetchDataFromApi(`/api/home/search?q=${encodeURIComponent(query)}&limit=5`);
+      if (response?.success) {
+        setSearchResults(response.data);
+        setShowSearchResults(true);
+      }
+    } catch (error) {
+      console.error("Error searching venues:", error);
+    } finally {
+      setSearchLoading(false);
+    }
+  };
+
+  // Handle search input change
+  const handleSearchChange = (e) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+    
+    if (query.trim()) {
+      const timeoutId = setTimeout(() => searchVenues(query), 500);
+      return () => clearTimeout(timeoutId);
+    } else {
+      setSearchResults([]);
+      setShowSearchResults(false);
+    }
+  };
+
+  // Helper function to get image source with fallback
+  const getImageSource = (photos, sportType = null) => {
+    if (photos && photos.length > 0) {
+      return photos[0];
+    }
+    
+    // Return relevant static image based on sport type
+    if (sportType) {
+      const sportImages = {
+        'badminton': '/badminton.jpg',
+        'tennis': '/tennis.jpg',
+        'football': '/football.jpeg',
+        'cricket': '/cricket.jpg',
+        'basketball': '/football.jpeg', // Using football as fallback
+        'table-tennis': '/table tennis.jpeg',
+        'squash': '/tennis.jpg', // Using tennis as fallback
+        'volleyball': '/football.jpeg' // Using football as fallback
+      };
+      return sportImages[sportType] || '/football field.jpg';
+    }
+    
+    return '/football field.jpg';
+  };
+
+  // Helper function to get sport image
+  const getSportImage = (sportName) => {
+    const sportImages = {
+      'badminton': '/badminton.jpg',
+      'tennis': '/tennis.jpg',
+      'football': '/football.jpeg',
+      'cricket': '/cricket.jpg',
+      'basketball': '/football.jpeg',
+      'table-tennis': '/table tennis.jpeg',
+      'squash': '/tennis.jpg',
+      'volleyball': '/football.jpeg',
+      'swimming': '/t1.jpeg'
+    };
+    return sportImages[sportName.toLowerCase()] || '/football field.jpg';
+  };
+
+  if (loading) {
+    return (
+      <div className="w-full flex items-center justify-center h-64">
+        <FaSpinner className="animate-spin text-4xl text-blue-600" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="w-full text-center py-12">
+        <p className="text-red-600 text-lg mb-4">{error}</p>
+        <button 
+          onClick={() => window.location.reload()} 
+          className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
+        >
+          Retry
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full relative">
-      {/* Location Search */}
+      {/* Hero Section with Search */}
       <section className="grid grid-cols-1 md:grid-cols-2 gap-8 p-8 relative">
         {/* Left */}
         <div className="flex flex-col justify-center space-y-6">
-          <div className="relative">
+          <div className="relative" ref={searchRef}>
             <div className="flex items-center gap-3 border-2 border-white/20 rounded-2xl px-6 py-4 w-full max-w-md bg-white/80 backdrop-blur-md shadow-2xl transform hover:scale-105 transition-all duration-300">
-              <FaMapMarkerAlt className="text-red-500 text-xl drop-shadow-lg" />
+              <FaSearch className="text-blue-500 text-xl drop-shadow-lg" />
               <input
                 type="text"
-                placeholder="Enter your location"
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
+                placeholder="Search for venues, sports, or cities..."
+                value={searchQuery}
+                onChange={handleSearchChange}
                 className="flex-1 outline-none bg-transparent text-gray-700 font-medium placeholder-gray-500"
               />
+              {searchLoading && <FaSpinner className="animate-spin text-blue-500" />}
             </div>
+            
+            {/* Search Results Dropdown */}
+            {showSearchResults && searchResults.length > 0 && (
+              <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-2xl border border-gray-200 z-50 max-h-80 overflow-y-auto">
+                {searchResults.map((venue) => (
+                  <Link 
+                    key={venue._id} 
+                    to={`/venuedetails/${venue._id}`}
+                    onClick={() => setShowSearchResults(false)}
+                  >
+                    <div className="p-4 hover:bg-gray-50 border-b border-gray-100 last:border-b-0">
+                      <div className="flex items-center gap-3">
+                        <img 
+                          src={getImageSource(venue.photos, venue.sportsAvailable?.[0])} 
+                          alt={venue.name}
+                          className="w-12 h-12 rounded-lg object-cover"
+                          onError={(e) => {
+                            e.target.src = getImageSource(null, venue.sportsAvailable?.[0]);
+                          }}
+                        />
+                        <div>
+                          <h4 className="font-semibold text-gray-800">{venue.name}</h4>
+                          <p className="text-sm text-gray-600">
+                            {venue.address?.city}, {venue.address?.state}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            {venue.sportsAvailable?.join(', ')} • ₹{venue.startingPrice}/hour
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
           </div>
+          
           <div className="space-y-4">
             <h2 className="text-4xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-emerald-600 bg-clip-text text-transparent drop-shadow-lg">
               FIND PLAYERS & VENUES NEARBY
             </h2>
             <p className="text-gray-600 max-w-md text-lg leading-relaxed">
-              Seamlessly explore sports venues and play with sports enthusiasts
-              just like you!
+              Seamlessly explore sports venues and play with sports enthusiasts just like you!
             </p>
+            
+            {/* Stats */}
+            {homeData?.stats && (
+              <div className="flex gap-6 text-sm">
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-blue-600">{homeData.stats.totalVenues}</div>
+                  <div className="text-gray-600">Venues</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-purple-600">{homeData.stats.totalSports}</div>
+                  <div className="text-gray-600">Sports</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-emerald-600">{homeData.stats.totalBookings}</div>
+                  <div className="text-gray-600">Bookings</div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -137,10 +264,10 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Book Venues Section */}
+      {/* Popular Venues Section */}
       <div className="flex justify-between items-center px-8 mt-12">
         <h3 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-          Book Venues
+          Popular Venues
         </h3>
         <Link to={"/allvenue"}>
           <button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 font-semibold">
@@ -149,65 +276,62 @@ const Home = () => {
         </Link>
       </div>
 
-      {/* Swiper Slider */}
+      {/* Venues Grid */}
       <div className="px-8 mt-8">
-        <Swiper
-          modules={[Navigation]}
-          navigation
-          spaceBetween={24}
-          slidesPerView={1}
-          breakpoints={{
-            640: { slidesPerView: 2 },
-            1024: { slidesPerView: 4 },
-          }}
-        >
-          {venues.map((venue) => (
-            <SwiperSlide key={venue.id}>
-              <div className="bg-white/90 backdrop-blur-md rounded-2xl shadow-2xl overflow-hidden hover:shadow-3xl transition-all duration-500 h-[380px] flex flex-col transform hover:scale-105 border border-white/20 group">
-                <div className="relative overflow-hidden h-48">
-                  <img
-                    src={venue.image}
-                    alt={venue.name}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
-                  <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full">
-                    <div className="flex items-center text-yellow-500 font-bold">
-                      <FaStar className="mr-1" />
-                      {venue.rating}
-                    </div>
-                  </div>
-                </div>
-                <div className="p-6 flex-1 flex flex-col justify-between">
-                  <div>
-                    <h4 className="font-bold text-xl text-gray-800 mb-2">
-                      {venue.name}
-                    </h4>
-                    <div className="flex items-center text-gray-600 text-sm mb-3">
-                      <FaMapMarkerAlt className="mr-2 text-red-500" />
-                      {venue.location}
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      {venue.tags.map((tag, index) => (
-                        <span
-                          key={index}
-                          className="text-xs bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 px-3 py-1 rounded-full font-medium border border-blue-200"
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="mt-4">
-                    <span className="text-gray-500 text-sm">
-                      ({venue.reviews} reviews)
-                    </span>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {popularVenues.map((venue) => (
+            <div key={venue._id} className="bg-white/90 backdrop-blur-md rounded-2xl shadow-2xl overflow-hidden hover:shadow-3xl transition-all duration-500 transform hover:scale-105 border border-white/20 group">
+              <div className="relative overflow-hidden h-48">
+                <img 
+                  src={getImageSource(venue.photos, venue.sportsAvailable?.[0])} 
+                  alt={venue.name} 
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  onError={(e) => {
+                    e.target.src = getImageSource(null, venue.sportsAvailable?.[0]);
+                  }}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
+                <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full">
+                  <div className="flex items-center text-yellow-500 font-bold">
+                    <FaStar className="mr-1" />
+                    {venue.rating || "N/A"}
                   </div>
                 </div>
               </div>
-            </SwiperSlide>
+              <div className="p-6">
+                <h4 className="font-bold text-xl text-gray-800 mb-2">{venue.name}</h4>
+                <div className="flex items-center text-gray-600 text-sm mb-3">
+                  <FaMapMarkerAlt className="mr-2 text-red-500" />
+                  {venue.address?.city}, {venue.address?.state}
+                </div>
+                <p className="text-gray-600 text-sm mb-3" style={{ 
+                  display: '-webkit-box',
+                  WebkitLineClamp: 2,
+                  WebkitBoxOrient: 'vertical',
+                  overflow: 'hidden'
+                }}>{venue.description}</p>
+                <div className="flex flex-wrap gap-2 mb-3">
+                  {venue.sportsAvailable?.map((sport, index) => (
+                    <span
+                      key={index}
+                      className="text-xs bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 px-3 py-1 rounded-full font-medium border border-blue-200"
+                    >
+                      {sport}
+                    </span>
+                  ))}
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-green-600 font-bold">₹{venue.startingPrice || "N/A"}/hour</span>
+                  <Link to={`/venuedetails/${venue._id}`}>
+                    <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm">
+                      View Details
+                    </button>
+                  </Link>
+                </div>
+              </div>
+            </div>
           ))}
-        </Swiper>
+        </div>
       </div>
 
       {/* Popular Sports Section */}
@@ -217,26 +341,37 @@ const Home = () => {
         </h3>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-6">
           {sports.map((sport, index) => (
-            <button
-              key={index}
+            <Link 
+              key={sport._id || index} 
+              to={`/allvenue?sport=${sport.sport}`}
               className="flex flex-col items-center bg-white/90 backdrop-blur-md rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-500 transform hover:scale-110 border border-white/20 group"
-              onClick={() => alert(`You selected ${sport.name}`)}
             >
               <div className="relative overflow-hidden w-full h-32">
-                <img
-                  src={sport.image}
-                  alt={sport.name}
+                <img 
+                  src={getSportImage(sport.sport)} 
+                  alt={sport.displayName} 
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  onError={(e) => {
+                    e.target.src = getSportImage('badminton'); // Fallback to badminton
+                  }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
               </div>
-              <span className="p-4 font-semibold text-gray-800 group-hover:text-blue-600 transition-colors duration-300">
-                {sport.name}
-              </span>
-            </button>
+              <div className="p-4 text-center">
+                <span className="font-semibold text-gray-800 group-hover:text-blue-600 transition-colors duration-300">
+                  {sport.displayName}
+                </span>
+                <div className="text-xs text-gray-500 mt-1">
+                  {sport.venueCount} venues • ₹{sport.avgPrice}/hr
+                </div>
+              </div>
+            </Link>
           ))}
         </div>
       </div>
+
+      {/* Slider Component */}
+      <Slider />
     </div>
   );
 };

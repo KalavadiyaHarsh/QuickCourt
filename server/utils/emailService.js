@@ -1,5 +1,4 @@
-import http from 'http';
-import nodemailer from 'nodemailer';
+const nodemailer = require('nodemailer');
 
 const transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
@@ -14,7 +13,7 @@ const transporter = nodemailer.createTransport({
 async function sendEmail(to, subject, text, html) {
     try {
         const info = await transporter.sendMail({
-            from: process.env.EMAIL,
+            from: `"QuickCourt" <${process.env.EMAIL}>`,
             to,
             subject,
             text,
@@ -24,7 +23,6 @@ async function sendEmail(to, subject, text, html) {
             success: true,
             messageId: info.messageId
         };
-        
     } catch (error) {
         console.error('Error sending email:', error);
         return {
@@ -34,5 +32,4 @@ async function sendEmail(to, subject, text, html) {
     }
 }
 
-
-export default sendEmail;
+module.exports = sendEmail;
