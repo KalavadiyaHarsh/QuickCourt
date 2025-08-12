@@ -47,7 +47,7 @@ const ChatBot = () => {
     try {
       console.log('Sending message to webhook:', inputMessage);
       
-      const response = await fetch('https://jaybhimani.app.n8n.cloud/webhook/website', {
+      const response = await fetch('https://jaybhimani.app.n8n.cloud/webhook-test/website', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

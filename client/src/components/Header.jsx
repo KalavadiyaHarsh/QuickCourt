@@ -14,18 +14,18 @@ const Header = () => {
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
     localStorage.removeItem('userData');
-    
+
     // Update context
     context.setIsLogin && context.setIsLogin(false);
     context.setUserData && context.setUserData(null);
-    
+
     // Close menus
     setIsMenuOpen(false);
     setIsProfileMenuOpen(false);
-    
+
     // Navigate to home
     navigate('/');
-    
+
     // Show success message
     context.openAlertBox && context.openAlertBox("Logged out successfully", "success");
   };
@@ -66,12 +66,7 @@ const Header = () => {
             <Link to="/allvenue" className="text-gray-700 hover:text-blue-600 transition-colors">
               Venues
             </Link>
-            <Link to="/about" className="text-gray-700 hover:text-blue-600 transition-colors">
-              About
-            </Link>
-            <Link to="/contact" className="text-gray-700 hover:text-blue-600 transition-colors">
-              Contact
-            </Link>
+            
           </nav>
 
           {/* User Actions */}
@@ -240,101 +235,11 @@ const Header = () => {
         {/* Mobile Navigation */}
         {isMenuOpen && (
           <div className="md:hidden py-4 border-t border-gray-200">
-            <nav className="flex flex-col space-y-4">
-              <Link
-                to="/"
-                onClick={() => setIsMenuOpen(false)}
-                className="text-gray-700 hover:text-blue-600 transition-colors"
-              >
-                Home
-              </Link>
-              <Link
-                to="/allvenue"
-                onClick={() => setIsMenuOpen(false)}
-                className="text-gray-700 hover:text-blue-600 transition-colors"
-              >
+            <nav className="hidden md:flex items-center space-x-8">
+              
+              <Link to="/allvenue" className="text-gray-700 hover:text-blue-600 transition-colors">
                 Venues
               </Link>
-              <Link
-                to="/about"
-                onClick={() => setIsMenuOpen(false)}
-                className="text-gray-700 hover:text-blue-600 transition-colors"
-              >
-                About
-              </Link>
-              <Link
-                to="/contact"
-                onClick={() => setIsMenuOpen(false)}
-                className="text-gray-700 hover:text-blue-600 transition-colors"
-              >
-                Contact
-              </Link>
-              
-              {/* Admin Options in Mobile Menu */}
-              {context.isLogin && isAdmin && (
-                <>
-                  <div className="border-t border-gray-200 pt-4">
-                    <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">Admin Panel</p>
-                    <Link
-                      to="/admin"
-                      onClick={() => setIsMenuOpen(false)}
-                      className="flex items-center text-gray-700 hover:text-blue-600 transition-colors"
-                    >
-                      <FaChartBar className="mr-2 text-gray-400" />
-                      System Dashboard
-                    </Link>
-                    <Link
-                      to="/admin/users"
-                      onClick={() => setIsMenuOpen(false)}
-                      className="flex items-center text-gray-700 hover:text-blue-600 transition-colors mt-2"
-                    >
-                      <FaUsers className="mr-2 text-gray-400" />
-                      Manage Users
-                    </Link>
-                    <Link
-                      to="/admin/venues"
-                      onClick={() => setIsMenuOpen(false)}
-                      className="flex items-center text-gray-700 hover:text-blue-600 transition-colors mt-2"
-                    >
-                      <FaBuilding className="mr-2 text-gray-400" />
-                      Approve Venues
-                    </Link>
-                  </div>
-                </>
-              )}
-
-              {/* Facility Owner Options in Mobile Menu */}
-              {context.isLogin && currentUser?.role === 'facility_owner' && (
-                <>
-                  <div className="border-t border-gray-200 pt-4">
-                    <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">Facility Management</p>
-                    <Link
-                      to="/Owner"
-                      onClick={() => setIsMenuOpen(false)}
-                      className="flex items-center text-gray-700 hover:text-blue-600 transition-colors"
-                    >
-                      <FaChartBar className="mr-2 text-gray-400" />
-                      My Dashboard
-                    </Link>
-                    <Link
-                      to="/facility-management"
-                      onClick={() => setIsMenuOpen(false)}
-                      className="flex items-center text-gray-700 hover:text-blue-600 transition-colors mt-2"
-                    >
-                      <FaBuilding className="mr-2 text-gray-400" />
-                      Manage Venues
-                    </Link>
-                    <Link
-                      to="/court-management"
-                      onClick={() => setIsMenuOpen(false)}
-                      className="flex items-center text-gray-700 hover:text-blue-600 transition-colors mt-2"
-                    >
-                      <FaUsers className="mr-2 text-gray-400" />
-                      Manage Courts
-                    </Link>
-                  </div>
-                </>
-              )}
             </nav>
           </div>
         )}

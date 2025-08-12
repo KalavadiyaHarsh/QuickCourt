@@ -11,6 +11,21 @@ router.get('/ping', (req, res) => {
     res.json({ success: true, message: 'Facility owner routes are accessible' });
 });
 
+// Test endpoint for venue creation without auth (temporary)
+router.post('/test-venue', (req, res) => {
+    console.log('=== TEST VENUE ENDPOINT ===');
+    console.log('Request body:', req.body);
+    console.log('Request headers:', req.headers);
+    console.log('Content-Type:', req.headers['content-type']);
+    
+    res.json({ 
+        success: true, 
+        message: 'Test endpoint working',
+        receivedData: req.body,
+        headers: req.headers
+    });
+});
+
 // Ensure uploads directory exists
 const uploadsDir = path.join(__dirname, '..', 'uploads');
 if (!fs.existsSync(uploadsDir)) {
@@ -46,6 +61,18 @@ const upload = multer({
 // All facility owner routes require authentication and facility_owner role
 router.use(protect);
 router.use(authorize('facility_owner'));
+
+// Debug middleware to log all requests
+router.use((req, res, next) => {
+    console.log('=== FACILITY OWNER ROUTE DEBUG ===');
+    console.log('Route accessed:', req.path);
+    console.log('Method:', req.method);
+    console.log('User:', req.user);
+    console.log('Request body keys:', Object.keys(req.body));
+    console.log('Request body values:', Object.values(req.body));
+    console.log('Content-Type:', req.headers['content-type']);
+    next();
+});
 
 // Dashboard
 router.get('/dashboard', facilityOwnerController.getFacilityOwnerDashboard);

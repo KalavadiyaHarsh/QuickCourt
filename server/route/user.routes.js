@@ -13,6 +13,7 @@ const {
     addReview
 } = require('../controllers/user.controller');
 const { protect } = require('../middleware/auth');
+const upload = require('../middleware/multer');
 
 const router = express.Router();
 
@@ -22,7 +23,10 @@ router.use(protect);
 // Profile routes
 router.route('/profile')
     .get(getProfile)
-    .put(updateProfile);
+    .put(updateProfile); // For regular updates (no files)
+
+// Profile update with file upload
+router.put('/profile/upload', upload.single('avatar'), updateProfile); // For updates with avatar
 
 // Venue routes
 router.get('/venues/popular', getPopularVenues);

@@ -20,6 +20,11 @@ const userSchema = new mongoose.Schema({
         required: true,
         trim: true
     },
+    phone: {
+        type: String,
+        trim: true,
+        default: ''
+    },
     avatar: {
         type: String,
         default: 'default.jpg'

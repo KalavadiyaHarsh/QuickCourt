@@ -15,7 +15,8 @@ const ForgotPassword = () => {
     const [isShowPassword2, setIsShowPassword2] = useState(false);
     const [isLoading, setIsLoading] = useState(false)
     const [formFields, setFormFields] = useState({
-        email: localStorage.getItem("userEmail"),
+        email: localStorage.getItem("userEmail") || "",
+        otp: "",
         newPassword: '',
         confirmPassword: ''
     })
@@ -38,8 +39,26 @@ const ForgotPassword = () => {
 
         setIsLoading(true);
 
+        if (formFields.email.trim() === "") {
+            context.openAlertBox("error", "Please enter email!");
+            setIsLoading(false);
+            return;
+        }
+
+        if (formFields.otp.trim() === "") {
+            context.openAlertBox("error", "Please enter OTP!");
+            setIsLoading(false);
+            return;
+        }
+
         if (formFields.newPassword.trim() === "") {
             context.openAlertBox("error", "Please enter New Password!");
+            setIsLoading(false);
+            return;
+        }
+
+        if (formFields.newPassword.length < 6) {
+            context.openAlertBox("error", "Password must be at least 6 characters long!");
             setIsLoading(false);
             return;
         }
@@ -51,27 +70,46 @@ const ForgotPassword = () => {
         }
 
         if (formFields.confirmPassword !== formFields.newPassword) {
-            context.openAlertBox("error", "New Password and Confirm Password not match!");
+            context.openAlertBox("error", "New Password and Confirm Password do not match!");
+            setIsLoading(false);
+            return;
+        }
+
+        // Password strength validation
+        if (!/(?=.*[a-zA-Z])/.test(formFields.newPassword)) {
+            context.openAlertBox("error", "Password must contain at least one letter!");
+            setIsLoading(false);
+            return;
+        }
+
+        if (!/(?=.*\d)/.test(formFields.newPassword)) {
+            context.openAlertBox("error", "Password must contain at least one number!");
             setIsLoading(false);
             return;
         }
 
 
-        postData("/api/user/reset-password", formFields).then((res) => {
-            if (res?.error !== true) {
+        postData("/api/auth/reset-password", formFields).then((res) => {
+            if (res?.success === true) {
                 setIsLoading(false);
                 context.openAlertBox("success", res?.message);
                 localStorage.removeItem("userEmail")
                 localStorage.removeItem("actionType")
                 setFormFields({
+                    email: "",
+                    otp: "",
                     newPassword: '',
                     confirmPassword: ''
                 })
                 history("/login")
             } else {
-                context.openAlertBox("error", res?.message);
+                context.openAlertBox("error", res?.message || "Password reset failed");
                 setIsLoading(false);
             }
+        }).catch((error) => {
+            console.error("Password reset error:", error);
+            context.openAlertBox("error", "An error occurred during password reset");
+            setIsLoading(false);
         })
 
     }
@@ -84,6 +122,35 @@ const ForgotPassword = () => {
                     <h3 className='text-center text-[18px] text-black font-bold'>Log in to your account</h3>
 
                     <form className='w-full mt-5' onSubmit={handleSubmit}>
+                        <div className='from-group w-full mb-5'>
+                            <TextField
+                                type='email'
+                                id="email"
+                                label="Email"
+                                variant="outlined"
+                                className='w-full'
+                                name="email"
+                                value={formFields.email}
+                                onChange={onChangeInput}
+                                disabled
+                            />
+                            <p className="text-xs text-gray-500 mt-1">Email cannot be changed</p>
+                        </div>
+
+                        <div className='from-group w-full mb-5'>
+                            <TextField
+                                type='text'
+                                id="otp"
+                                label="OTP"
+                                variant="outlined"
+                                className='w-full'
+                                name="otp"
+                                value={formFields.otp}
+                                onChange={onChangeInput}
+                                placeholder="Enter the OTP sent to your email"
+                            />
+                        </div>
+
                         <div className='from-group w-full mb-5 relative'>
                             <TextField
                                 type={isShowPassword === false ? 'password' : 'text'}
