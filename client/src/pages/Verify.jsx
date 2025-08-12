@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-=======
-
->>>>>>> fbfa710 (final touch-up)
 import React, { useContext, useState } from 'react';
 import OtpBox from '../components/OtpBox';
 import { Button } from '@mui/material';
