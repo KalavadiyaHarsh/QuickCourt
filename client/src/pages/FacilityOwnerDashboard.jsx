@@ -15,9 +15,9 @@ const FacilityOwnerDashboard = () => {
   // Use custom hook for scroll to top
   useScrollToTop();
 
-  // Check if user is admin
+  // Check if user is facility owner
   useEffect(() => {
-    const checkAdminAccess = () => {
+    const checkFacilityOwnerAccess = () => {
       const userData = context.userData || JSON.parse(localStorage.getItem('userData') || '{}');
       
       if (!context.isLogin) {
@@ -25,14 +25,14 @@ const FacilityOwnerDashboard = () => {
         return;
       }
 
-      if (userData.role !== 'admin') {
+      if (userData.role !== 'facility_owner') {
         navigate('/');
-        context.openAlertBox && context.openAlertBox("Access denied. Admin privileges required.", "error");
+        context.openAlertBox && context.openAlertBox("Access denied. Facility owner privileges required.", "error");
         return;
       }
     };
 
-    checkAdminAccess();
+    checkFacilityOwnerAccess();
   }, [context.isLogin, context.userData, navigate, context]);
 
   // Fetch facility owner dashboard data
@@ -91,7 +91,7 @@ const FacilityOwnerDashboard = () => {
     return null;
   }
 
-  const { stats, recentUsers, recentVenues, recentBookings } = dashboardData;
+  const { stats, recentVenues, recentBookings } = dashboardData;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-emerald-50 p-6">
@@ -99,10 +99,10 @@ const FacilityOwnerDashboard = () => {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
-            Admin Dashboard
+            Facility Owner Dashboard
           </h1>
           <p className="text-gray-600 text-lg">
-            Welcome back, {context.userData?.fullName || 'Admin'}! Here's what's happening in your system.
+            Welcome back, {context.userData?.fullName || 'Facility Owner'}! Here's what's happening with your venues.
           </p>
         </div>
 
@@ -111,11 +111,11 @@ const FacilityOwnerDashboard = () => {
           <div className="bg-white/90 backdrop-blur-md rounded-2xl shadow-xl p-6 border border-white/20">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-600 text-sm font-medium">Total Users</p>
-                <p className="text-3xl font-bold text-blue-600">{stats.totalUsers}</p>
+                <p className="text-gray-600 text-sm font-medium">Total Venues</p>
+                <p className="text-3xl font-bold text-blue-600">{stats.totalVenues}</p>
               </div>
               <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-                <FaUsers className="text-blue-600 text-xl" />
+                <FaBuilding className="text-blue-600 text-xl" />
               </div>
             </div>
           </div>
@@ -123,8 +123,8 @@ const FacilityOwnerDashboard = () => {
           <div className="bg-white/90 backdrop-blur-md rounded-2xl shadow-xl p-6 border border-white/20">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-600 text-sm font-medium">Total Venues</p>
-                <p className="text-3xl font-bold text-purple-600">{stats.totalVenues}</p>
+                <p className="text-gray-600 text-sm font-medium">Total Courts</p>
+                <p className="text-3xl font-bold text-purple-600">{stats.totalCourts}</p>
               </div>
               <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
                 <FaBuilding className="text-purple-600 text-xl" />
@@ -158,33 +158,7 @@ const FacilityOwnerDashboard = () => {
         </div>
 
         {/* Recent Activity */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Recent Users */}
-          <div className="bg-white/90 backdrop-blur-md rounded-2xl shadow-xl p-6 border border-white/20">
-            <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-              <FaUsers className="text-blue-600" />
-              Recent Users
-            </h3>
-            <div className="space-y-3">
-              {recentUsers.map((user, index) => (
-                <div key={user._id || index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                  <div>
-                    <p className="font-medium text-gray-800">{user.fullName}</p>
-                    <p className="text-sm text-gray-600">{user.email}</p>
-                    <p className="text-xs text-gray-500 capitalize">{user.role}</p>
-                  </div>
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                    user.status === 'active' ? 'bg-green-100 text-green-800' :
-                    user.status === 'inactive' ? 'bg-gray-100 text-gray-800' :
-                    'bg-red-100 text-red-800'
-                  }`}>
-                    {user.status}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Recent Venues */}
           <div className="bg-white/90 backdrop-blur-md rounded-2xl shadow-xl p-6 border border-white/20">
             <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
@@ -192,21 +166,28 @@ const FacilityOwnerDashboard = () => {
               Recent Venues
             </h3>
             <div className="space-y-3">
-              {recentVenues.map((venue, index) => (
-                <div key={venue._id || index} className="p-3 bg-gray-50 rounded-lg">
-                  <p className="font-medium text-gray-800">{venue.name}</p>
-                  <p className="text-sm text-gray-600">
-                    {venue.address?.city}, {venue.address?.state}
-                  </p>
-                  <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium mt-1 ${
-                    venue.status === 'approved' ? 'bg-green-100 text-green-800' :
-                    venue.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                    'bg-red-100 text-red-800'
-                  }`}>
-                    {venue.status}
-                  </span>
-                </div>
-              ))}
+              {recentVenues && recentVenues.length > 0 ? (
+                recentVenues.map((venue, index) => (
+                  <div key={venue._id || index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div>
+                      <p className="font-medium text-gray-800">{venue.name}</p>
+                      <p className="text-sm text-gray-600">
+                        {venue.address?.city}, {venue.address?.state}
+                      </p>
+                      <p className="text-xs text-gray-500 capitalize">{venue.status}</p>
+                    </div>
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                      venue.status === 'approved' ? 'bg-green-100 text-green-800' :
+                      venue.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                      'bg-red-100 text-red-800'
+                    }`}>
+                      {venue.status}
+                    </span>
+                  </div>
+                ))
+              ) : (
+                <p className="text-gray-500 text-center py-4">No venues yet</p>
+              )}
             </div>
           </div>
 
@@ -217,34 +198,38 @@ const FacilityOwnerDashboard = () => {
               Recent Bookings
             </h3>
             <div className="space-y-3">
-              {recentBookings.map((booking, index) => (
-                <div key={booking._id || index} className="p-3 bg-gray-50 rounded-lg">
-                  <div className="flex justify-between items-start mb-2">
-                    <p className="font-medium text-gray-800">
-                      {booking.user?.fullName || 'Unknown User'}
-                    </p>
-                    <span className="text-sm font-bold text-green-600">
-                      ₹{booking.totalAmount}
-                    </span>
+              {recentBookings && recentBookings.length > 0 ? (
+                recentBookings.map((booking, index) => (
+                  <div key={booking._id || index} className="p-3 bg-gray-50 rounded-lg">
+                    <div className="flex justify-between items-start mb-2">
+                      <p className="font-medium text-gray-800">
+                        {booking.user?.fullName || 'Unknown User'}
+                      </p>
+                      <span className="text-sm font-bold text-green-600">
+                        ₹{booking.totalAmount}
+                      </span>
+                    </div>
+                    <p className="text-sm text-gray-600">{booking.venue?.name}</p>
+                    <div className="flex gap-2 mt-2">
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        booking.bookingStatus === 'confirmed' ? 'bg-green-100 text-green-800' :
+                        booking.bookingStatus === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                        'bg-red-100 text-red-800'
+                      }`}>
+                        {booking.bookingStatus}
+                      </span>
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        booking.paymentStatus === 'paid' ? 'bg-green-100 text-green-800' :
+                        'bg-yellow-100 text-yellow-800'
+                      }`}>
+                        {booking.paymentStatus}
+                      </span>
+                    </div>
                   </div>
-                  <p className="text-sm text-gray-600">{booking.venue?.name}</p>
-                  <div className="flex gap-2 mt-2">
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      booking.bookingStatus === 'confirmed' ? 'bg-green-100 text-green-800' :
-                      booking.bookingStatus === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                      'bg-red-100 text-red-800'
-                    }`}>
-                      {booking.bookingStatus}
-                    </span>
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      booking.paymentStatus === 'paid' ? 'bg-green-100 text-green-800' :
-                      'bg-yellow-100 text-yellow-800'
-                    }`}>
-                      {booking.paymentStatus}
-                    </span>
-                  </div>
-                </div>
-              ))}
+                ))
+              ) : (
+                <p className="text-gray-500 text-center py-4">No bookings yet</p>
+              )}
             </div>
           </div>
         </div>
@@ -258,17 +243,17 @@ const FacilityOwnerDashboard = () => {
               className="p-4 bg-blue-50 hover:bg-blue-100 rounded-xl border border-blue-200 transition-colors text-left"
             >
               <FaBuilding className="text-blue-600 text-xl mb-2" />
-              <p className="font-medium text-blue-800">Manage Venues</p>
-              <p className="text-sm text-blue-600">Approve, reject, or manage venue listings</p>
+              <p className="font-medium text-blue-800">Create New Venue</p>
+              <p className="text-sm text-blue-600">Add a new sports venue to your portfolio</p>
             </button>
 
             <button
               onClick={() => navigate('/court-management')}
               className="p-4 bg-purple-50 hover:bg-purple-100 rounded-xl border border-purple-200 transition-colors text-left"
             >
-              <FaUsers className="text-purple-600 text-xl mb-2" />
-              <p className="font-medium text-purple-800">Manage Users</p>
-              <p className="text-sm text-purple-600">View and manage user accounts</p>
+              <FaBuilding className="text-purple-600 text-xl mb-2" />
+              <p className="font-medium text-purple-800">Manage Courts</p>
+              <p className="text-sm text-purple-600">Add and manage courts within your venues</p>
             </button>
 
             <button
@@ -277,7 +262,7 @@ const FacilityOwnerDashboard = () => {
             >
               <FaChartBar className="text-emerald-600 text-xl mb-2" />
               <p className="font-medium text-emerald-800">View All Venues</p>
-              <p className="text-sm text-emerald-600">Browse and manage all venue listings</p>
+              <p className="text-sm text-emerald-600">Browse and monitor all venue listings</p>
             </button>
           </div>
         </div>

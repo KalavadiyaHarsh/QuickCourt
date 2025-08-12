@@ -50,14 +50,24 @@ export default function EditProfile({ user, onSave, onReset }) {
         // If avatar is selected, use uploadImage for multipart form data
         const formData = new FormData();
         formData.append('fullName', form.fullName);
+        formData.append('phone', form.phone || ''); // Include phone number
         formData.append('avatar', avatar);
         
-        response = await uploadImage("/api/users/profile", formData);
+        console.log('Sending FormData with avatar:', {
+          fullName: form.fullName,
+          phone: form.phone,
+          avatar: avatar.name
+        });
+        
+        response = await uploadImage("/api/users/profile/upload", formData);
       } else {
         // If no avatar, use editData for JSON data
         const updateData = {
           fullName: form.fullName,
+          phone: form.phone || '' // Include phone number
         };
+        
+        console.log('Sending JSON data:', updateData);
         
         response = await editData("/api/users/profile", updateData);
       }
@@ -70,6 +80,9 @@ export default function EditProfile({ user, onSave, onReset }) {
         // Reset avatar state
         setAvatar(null);
         setAvatarPreview(updatedUser.avatar && updatedUser.avatar !== 'default.jpg' ? updatedUser.avatar : '/man.png');
+        
+        // Show success message
+        alert('Profile updated successfully!');
       } else {
         alert(response?.message || "Failed to update profile");
       }
@@ -156,11 +169,15 @@ export default function EditProfile({ user, onSave, onReset }) {
           </label>
           <input 
             name="phone" 
+            type="tel"
             value={form.phone} 
             onChange={handleChange} 
             className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors" 
-            placeholder="Enter your phone number"
+            placeholder="Enter your phone number (e.g., +91 98765 43210)"
+            pattern="[+]?[0-9\s\-\(\)]+"
+            title="Please enter a valid phone number"
           />
+          <p className="text-xs text-gray-500 mt-1">Include country code if applicable</p>
         </div>
         
         <div className="flex gap-3 pt-4">

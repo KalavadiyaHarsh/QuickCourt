@@ -280,7 +280,7 @@ const Venue = () => {
               {venues.map((venue) => (
                 <div
                   key={venue._id}
-                  className="bg-white/90 backdrop-blur-md rounded-2xl shadow-2xl overflow-hidden hover:shadow-3xl transition-all duration-500 transform hover:scale-105 border border-white/20 group"
+                  className="bg-white/90 backdrop-blur-md rounded-2xl shadow-2xl overflow-hidden hover:shadow-3xl transition-all duration-500 transform hover:scale-105 border border-white/20 group flex flex-col"
                 >
                   <div className="relative overflow-hidden h-48">
                     <img 
@@ -299,7 +299,7 @@ const Venue = () => {
                       </div>
                     </div>
                   </div>
-                  <div className="p-6">
+                  <div className="p-6 flex flex-col flex-grow">
                     <div className="flex justify-between items-start mb-3">
                       <h4 className="font-bold text-xl text-gray-800">{venue.name}</h4>
                     </div>
@@ -325,13 +325,15 @@ const Venue = () => {
                         </span>
                       )}
                     </div>
-                    <Link to={`/venuedetails/${venue._id}`}>
-                      <button
-                        className="w-full inline-flex items-center justify-center px-6 py-3 rounded-full bg-gradient-to-r from-emerald-500 to-green-600 text-white font-semibold shadow-md hover:shadow-lg hover:from-emerald-600 hover:to-green-700 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2 focus:ring-offset-white transition-all duration-200"
-                      >
-                        View Details
-                      </button>
-                    </Link>
+                    <div className="mt-auto">
+                      <Link to={`/venuedetails/${venue._id}`} className="block w-full">
+                        <button
+                          className="w-full inline-flex items-center justify-center px-6 py-3 rounded-full bg-gradient-to-r from-emerald-500 to-green-600 text-white font-semibold shadow-md hover:shadow-lg hover:from-emerald-600 hover:to-green-700 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2 focus:ring-offset-white transition-all duration-200 transform hover:scale-105"
+                        >
+                          View Details
+                        </button>
+                      </Link>
+                    </div>
                   </div>
                 </div>
               ))}

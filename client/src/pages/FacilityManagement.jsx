@@ -117,13 +117,15 @@ const FacilityManagement = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (!facility.name || !facility.address.city || !facility.address.state) {
-      setError('Please fill in all required fields');
-      return;
-    }
-
-    if (facility.sportsAvailable.length === 0) {
-      setError('Please add at least one sport');
+    // Check required fields
+    const missingFields = [];
+    if (!facility.name) missingFields.push('Venue Name');
+    if (!facility.address.city) missingFields.push('City');
+    if (!facility.address.state) missingFields.push('State');
+    if (facility.sportsAvailable.length === 0) missingFields.push('At least one sport');
+    
+    if (missingFields.length > 0) {
+      setError(`Please fill in the following required fields: ${missingFields.join(', ')}`);
       return;
     }
 
@@ -138,16 +140,22 @@ const FacilityManagement = () => {
       formData.append('sportsAvailable', JSON.stringify(facility.sportsAvailable));
       formData.append('amenities', JSON.stringify(facility.amenities));
       
-      // Add address fields
-      formData.append('address[street]', facility.address.street);
-      formData.append('address[city]', facility.address.city);
-      formData.append('address[state]', facility.address.state);
-      formData.append('address[zip]', facility.address.zip);
+      // Add address fields (flattened for FormData compatibility)
+      formData.append('street', facility.address.street);
+      formData.append('city', facility.address.city);
+      formData.append('state', facility.address.state);
+      formData.append('zip', facility.address.zip);
 
       // Add photos
       facility.photos.forEach(photo => {
         formData.append('photos', photo);
       });
+
+      // Debug: Log what's being sent
+      console.log('Form data being sent:');
+      for (let [key, value] of formData.entries()) {
+        console.log(key, value);
+      }
 
       const response = await postData('/api/facility-owner/venues', formData);
 
@@ -164,6 +172,10 @@ const FacilityManagement = () => {
           amenities: [],
           photos: []
         });
+        
+        // Reset input fields
+        setSportsInput('');
+        setAmenitiesInput('');
         
         // Redirect to dashboard after a delay
         setTimeout(() => {
@@ -223,7 +235,7 @@ const FacilityManagement = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block mb-2 font-semibold text-gray-700">
-                  Venue Name *
+                  Venue Name <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -231,7 +243,9 @@ const FacilityManagement = () => {
                   placeholder="Enter venue name"
                   value={facility.name}
                   onChange={handleChange}
-                  className="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-300"
+                  className={`w-full p-3 border-2 rounded-xl focus:ring-2 transition-all duration-300 ${
+                    facility.name ? 'border-green-300 focus:border-green-500 focus:ring-green-200' : 'border-gray-200 focus:border-blue-500 focus:ring-blue-200'
+                  }`}
                   required
                 />
               </div>
@@ -253,7 +267,7 @@ const FacilityManagement = () => {
             {/* Address */}
             <div>
               <label className="block mb-2 font-semibold text-gray-700">
-                Address *
+                Address <span className="text-red-500">*</span>
               </label>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <input
@@ -270,7 +284,9 @@ const FacilityManagement = () => {
                   placeholder="City *"
                   value={facility.address.city}
                   onChange={handleChange}
-                  className="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-300"
+                  className={`w-full p-3 border-2 rounded-xl focus:ring-2 transition-all duration-300 ${
+                    facility.address.city ? 'border-green-300 focus:border-green-500 focus:ring-green-200' : 'border-gray-200 focus:border-blue-500 focus:ring-blue-200'
+                  }`}
                   required
                 />
                 <input
@@ -279,7 +295,9 @@ const FacilityManagement = () => {
                   placeholder="State *"
                   value={facility.address.state}
                   onChange={handleChange}
-                  className="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-300"
+                  className={`w-full p-3 border-2 rounded-xl focus:ring-2 transition-all duration-300 ${
+                    facility.address.state ? 'border-green-300 focus:border-green-500 focus:ring-green-200' : 'border-gray-200 focus:border-blue-500 focus:ring-blue-200'
+                  }`}
                   required
                 />
                 <input
@@ -296,16 +314,53 @@ const FacilityManagement = () => {
             {/* Sports Available */}
             <div>
               <label className="block mb-2 font-semibold text-gray-700">
-                Sports Available *
+                Sports Available <span className="text-red-500">*</span>
               </label>
-              <input
-                type="text"
-                placeholder="Type sport and press Enter (e.g., badminton, tennis)"
-                value={sportsInput}
-                onChange={(e) => setSportsInput(e.target.value)}
-                onKeyPress={handleSportsInput}
-                className="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-300"
-              />
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Type sport and press Enter (e.g., badminton, tennis)"
+                  value={sportsInput}
+                  onChange={(e) => setSportsInput(e.target.value)}
+                  onKeyPress={handleSportsInput}
+                  className={`w-full p-3 border-2 rounded-xl focus:ring-2 transition-all duration-300 ${
+                    facility.sportsAvailable.length > 0 ? 'border-green-300 focus:border-green-500 focus:ring-green-200' : 'border-gray-200 focus:border-blue-500 focus:ring-blue-200'
+                  }`}
+                />
+                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm">
+                  Press Enter to add
+                </div>
+              </div>
+              
+              {/* Quick Add Sports */}
+              <div className="mt-3">
+                <p className="text-sm text-gray-600 mb-2">Quick add common sports:</p>
+                <div className="flex flex-wrap gap-2">
+                  {['badminton', 'tennis', 'football', 'cricket', 'table-tennis', 'basketball'].map((sport) => (
+                    <button
+                      key={sport}
+                      type="button"
+                      onClick={() => {
+                        if (!facility.sportsAvailable.includes(sport)) {
+                          setFacility(prev => ({
+                            ...prev,
+                            sportsAvailable: [...prev.sportsAvailable, sport]
+                          }));
+                        }
+                      }}
+                      disabled={facility.sportsAvailable.includes(sport)}
+                      className={`px-3 py-1 rounded-full text-xs font-medium transition-all duration-200 ${
+                        facility.sportsAvailable.includes(sport)
+                          ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                          : 'bg-blue-100 text-blue-700 hover:bg-blue-200 hover:scale-105'
+                      }`}
+                    >
+                      {sport}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              
               {facility.sportsAvailable.length > 0 && (
                 <div className="flex flex-wrap gap-2 mt-3">
                   {facility.sportsAvailable.map((sport, index) => (
@@ -317,13 +372,25 @@ const FacilityManagement = () => {
                       <button
                         type="button"
                         onClick={() => removeSport(sport)}
-                        className="text-blue-600 hover:text-blue-800"
+                        className="text-blue-600 hover:text-blue-800 font-bold"
                       >
                         ×
                       </button>
                     </span>
                   ))}
+                  <button
+                    type="button"
+                    onClick={() => setFacility(prev => ({ ...prev, sportsAvailable: [] }))}
+                    className="text-red-600 hover:text-red-800 text-xs font-medium px-2 py-1 border border-red-300 rounded-full hover:bg-red-50"
+                  >
+                    Clear All
+                  </button>
                 </div>
+              )}
+              {facility.sportsAvailable.length === 0 && (
+                <p className="text-sm text-gray-500 mt-2">
+                  No sports added yet. Add at least one sport to continue.
+                </p>
               )}
             </div>
 
@@ -332,14 +399,49 @@ const FacilityManagement = () => {
               <label className="block mb-2 font-semibold text-gray-700">
                 Amenities
               </label>
-              <input
-                type="text"
-                placeholder="Type amenity and press Enter (e.g., parking, wifi)"
-                value={amenitiesInput}
-                onChange={(e) => setAmenitiesInput(e.target.value)}
-                onKeyPress={handleAmenitiesInput}
-                className="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-300"
-              />
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Type amenity and press Enter (e.g., parking, wifi)"
+                  value={amenitiesInput}
+                  onChange={(e) => setAmenitiesInput(e.target.value)}
+                  onKeyPress={handleAmenitiesInput}
+                  className="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-300"
+                />
+                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm">
+                  Press Enter to add
+                </div>
+              </div>
+              
+              {/* Quick Add Amenities */}
+              <div className="mt-3">
+                <p className="text-sm text-gray-600 mb-2">Quick add common amenities:</p>
+                <div className="flex flex-wrap gap-2">
+                  {['parking', 'wifi', 'changing rooms', 'shower', 'equipment rental', 'cafe', 'lockers'].map((amenity) => (
+                    <button
+                      key={amenity}
+                      type="button"
+                      onClick={() => {
+                        if (!facility.amenities.includes(amenity)) {
+                          setFacility(prev => ({
+                            ...prev,
+                            amenities: [...prev.amenities, amenity]
+                          }));
+                        }
+                      }}
+                      disabled={facility.amenities.includes(amenity)}
+                      className={`px-3 py-1 rounded-full text-xs font-medium transition-all duration-200 ${
+                        facility.amenities.includes(amenity)
+                          ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                          : 'bg-green-100 text-green-700 hover:bg-green-200 hover:scale-105'
+                      }`}
+                    >
+                      {amenity}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              
               {facility.amenities.length > 0 && (
                 <div className="flex flex-wrap gap-2 mt-3">
                   {facility.amenities.map((amenity, index) => (
@@ -351,13 +453,25 @@ const FacilityManagement = () => {
                       <button
                         type="button"
                         onClick={() => removeAmenity(amenity)}
-                        className="text-green-600 hover:text-green-800"
+                        className="text-green-600 hover:text-green-800 font-bold"
                       >
                         ×
                       </button>
                     </span>
                   ))}
+                  <button
+                    type="button"
+                    onClick={() => setFacility(prev => ({ ...prev, amenities: [] }))}
+                    className="text-red-600 hover:text-red-800 text-xs font-medium px-2 py-1 border border-red-300 rounded-full hover:bg-red-50"
+                  >
+                    Clear All
+                  </button>
                 </div>
+              )}
+              {facility.amenities.length === 0 && (
+                <p className="text-sm text-gray-500 mt-2">
+                  No amenities added yet. (Optional)
+                </p>
               )}
             </div>
 
@@ -403,6 +517,18 @@ const FacilityManagement = () => {
                 </div>
               )}
             </div>
+
+            {/* Debug Section - Remove this in production */}
+            {process.env.NODE_ENV === 'development' && (
+              <div className="bg-gray-100 p-4 rounded-lg">
+                <h4 className="font-semibold text-gray-700 mb-2">Debug Info:</h4>
+                <div className="text-sm text-gray-600">
+                  <p><strong>Sports Available:</strong> [{facility.sportsAvailable.join(', ')}] (Count: {facility.sportsAvailable.length})</p>
+                  <p><strong>Amenities:</strong> [{facility.amenities.join(', ')}] (Count: {facility.amenities.length})</p>
+                  <p><strong>Form Valid:</strong> {facility.name && facility.address.city && facility.address.state && facility.sportsAvailable.length > 0 ? 'Yes' : 'No'}</p>
+                </div>
+              </div>
+            )}
 
             {/* Submit Button */}
             <div className="flex gap-4">
