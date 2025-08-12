@@ -178,8 +178,18 @@ const createVenue = async (req, res) => {
         }
 
         // Validate required fields
-        if (!req.body.name || !req.body['address[city]'] || !req.body['address[state]']) {
+        console.log('=== VALIDATION DEBUG ===');
+        console.log('req.body.name:', req.body.name);
+        console.log('req.body.city:', req.body.city);
+        console.log('req.body.state:', req.body.state);
+        console.log('All req.body keys:', Object.keys(req.body));
+        console.log('All req.body values:', Object.values(req.body));
+        
+        if (!req.body.name || !req.body.city || !req.body.state) {
             console.log('Missing required fields validation failed');
+            console.log('name exists:', !!req.body.name);
+            console.log('city exists:', !!req.body.city);
+            console.log('state exists:', !!req.body.state);
             return res.status(400).json({
                 success: false,
                 message: 'Missing required fields: name, city, and state are required'
@@ -198,10 +208,10 @@ const createVenue = async (req, res) => {
             name: req.body.name,
             description: req.body.description || '',
             address: {
-                street: req.body['address[street]'] || '',
-                city: req.body['address[city]'] || '',
-                state: req.body['address[state]'] || '',
-                zip: req.body['address[zip]'] || ''
+                street: req.body.street || '',
+                city: req.body.city || '',
+                state: req.body.state || '',
+                zip: req.body.zip || ''
             },
             photos: photos,
             sportsAvailable: sportsAvailable,

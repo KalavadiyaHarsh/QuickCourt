@@ -24,6 +24,7 @@ exports.getProfile = async (req, res) => {
                 id: user._id,
                 fullName: user.fullName,
                 email: user.email,
+                phone: user.phone,
                 avatar: user.avatar,
                 role: user.role,
                 isVerified: user.isVerified,
@@ -42,15 +43,28 @@ exports.getProfile = async (req, res) => {
 };
 
 // @desc    Update user profile
-// @route   PUT /api/users/profile
+// @route   PUT /api/users/profile or PUT /api/users/profile/upload
 // @access  Private
 exports.updateProfile = async (req, res) => {
     try {
-        const { fullName, avatar } = req.body;
+        console.log('=== UPDATE PROFILE DEBUG ===');
+        console.log('Request body:', req.body);
+        console.log('Request files:', req.files);
+        console.log('Request file (single):', req.file);
+        
+        const { fullName, phone } = req.body;
 
         const fieldsToUpdate = {};
         if (fullName) fieldsToUpdate.fullName = fullName;
-        if (avatar) fieldsToUpdate.avatar = avatar;
+        if (phone !== undefined) fieldsToUpdate.phone = phone; // Allow empty string for phone
+
+        // Handle avatar file upload if present
+        if (req.file) {
+            fieldsToUpdate.avatar = `/uploads/${req.file.filename}`;
+            console.log('Avatar file uploaded:', req.file.filename);
+        }
+
+        console.log('Fields to update:', fieldsToUpdate);
 
         const user = await User.findByIdAndUpdate(
             req.user.id,
@@ -65,6 +79,8 @@ exports.updateProfile = async (req, res) => {
             });
         }
 
+        console.log('Profile updated successfully for user:', user._id);
+
         res.status(200).json({
             success: true,
             message: 'Profile updated successfully',
@@ -72,6 +88,7 @@ exports.updateProfile = async (req, res) => {
                 id: user._id,
                 fullName: user.fullName,
                 email: user.email,
+                phone: user.phone,
                 avatar: user.avatar,
                 role: user.role,
                 isVerified: user.isVerified,
