@@ -39,7 +39,7 @@ const Login = () => {
             localStorage.setItem("userEmail", formFields.email)
             localStorage.setItem("actionType", 'forgot-password')
 
-            postData("/api/user/forgot-password", {
+            postData("/api/auth/forgot-password", {
                 email: localStorage.getItem("userEmail"),
             }).then((res) => {
                 if (res?.error === false) {

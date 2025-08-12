@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+
+>>>>>>> fbfa710 (final touch-up)
 import React, { useContext, useState } from 'react';
 import OtpBox from '../components/OtpBox';
 import { Button } from '@mui/material';
@@ -21,32 +25,51 @@ const Verify = () => {
         const actionType = localStorage.getItem("actionType")
 
         if(actionType !== 'forgot-password'){
-            // alert(`OTP Entered: ${otp}`);
-             postData("/api/user/verifyEmail",{
+            // Regular email verification
+             postData("/api/auth/verify-email",{
                  email:localStorage.getItem("userEmail"),
                  otp:otp
              }).then((res)=>{
-                 if(res?.error === false){
+                 if(res?.success === true){
                      context.openAlertBox("success", res?.message);
+                     
+                     // Store user data and tokens
+                     if (res.data?.user && res.data?.accessToken) {
+                         localStorage.setItem("accessToken", res.data.accessToken);
+                         localStorage.setItem("refreshToken", res.data.refreshToken);
+                         localStorage.setItem("userData", JSON.stringify(res.data.user));
+                         
+                         // Update context with user data
+                         context.setUserData && context.setUserData(res.data.user);
+                         context.setIsLogin && context.setIsLogin(true);
+                     }
+                     
                      localStorage.removeItem("userEmail")
-                     history("/login")
+                     history("/")
                  }else{
-                     context.openAlertBox("error", res?.message);
+                     context.openAlertBox("error", res?.message || "Verification failed");
                  }
+             }).catch((error) => {
+                 console.error("Verification error:", error);
+                 context.openAlertBox("error", "An error occurred during verification");
              })
         }
         else{
-             postData("/api/user/verify-forgot-password-otp",{
+            // Forgot password verification - use the same endpoint for now
+            // TODO: Implement proper forgot password verification endpoint
+             postData("/api/auth/verify-email",{
                  email:localStorage.getItem("userEmail"),
                  otp:otp
              }).then((res)=>{
-                 if(res?.error === false){
-                     context.openAlertBox("success", res?.message);
-                  //   localStorage.removeItem("userEmail")
+                 if(res?.success === true){
+                     context.openAlertBox("success", "OTP verified successfully! You can now reset your password.");
                      history("/forgot-password")
                  }else{
-                     context.openAlertBox("error", res?.message);
+                     context.openAlertBox("error", res?.message || "Verification failed");
                  }
+             }).catch((error) => {
+                 console.error("Verification error:", error);
+                 context.openAlertBox("error", "An error occurred during verification");
              })
         }
 
