@@ -1,0 +1,121 @@
+[{
+        "_id": {
+            "$oid": "64f123456789abcdef123456"
+        },
+        "email": "john.doe@example.com",
+        "password": "$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi",
+        "fullName": "John Doe",
+        "avatar": "john-avatar.jpg",
+        "role": "user",
+        "isVerified": true,
+        "status": "active",
+        "createdAt": {
+            "$date": "2024-01-15T10:30:00.000Z"
+        }
+    },
+    {
+        "_id": {
+            "$oid": "64f123456789abcdef123457"
+        },
+        "email": "jane.smith@example.com",
+        "password": "$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi",
+        "fullName": "Jane Smith",
+        "avatar": "jane-avatar.jpg",
+        "role": "user",
+        "isVerified": true,
+        "status": "active",
+        "createdAt": {
+            "$date": "2024-01-20T14:20:00.000Z"
+        }
+    },
+    {
+        "_id": {
+            "$oid": "64f123456789abcdef123458"
+        },
+        "email": "mike.wilson@example.com",
+        "password": "$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi",
+        "fullName": "Mike Wilson",
+        "avatar": "mike-avatar.jpg",
+        "role": "user",
+        "isVerified": true,
+        "status": "active",
+        "createdAt": {
+            "$date": "2024-02-01T09:15:00.000Z"
+        }
+    },
+    {
+        "_id": {
+            "$oid": "64f123456789abcdef123459"
+        },
+        "email": "sarah.johnson@example.com",
+        "password": "$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi",
+        "fullName": "Sarah Johnson",
+        "avatar": "sarah-avatar.jpg",
+        "role": "facility_owner",
+        "isVerified": true,
+        "status": "active",
+        "createdAt": {
+            "$date": "2024-01-10T08:00:00.000Z"
+        }
+    },
+    {
+        "_id": {
+            "$oid": "64f123456789abcdef12345a"
+        },
+        "email": "david.brown@example.com",
+        "password": "$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi",
+        "fullName": "David Brown",
+        "avatar": "david-avatar.jpg",
+        "role": "facility_owner",
+        "isVerified": true,
+        "status": "active",
+        "createdAt": {
+            "$date": "2024-01-12T11:45:00.000Z"
+        }
+    },
+    {
+        "_id": {
+            "$oid": "64f123456789abcdef12345b"
+        },
+        "email": "admin@quickcourt.com",
+        "password": "$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi",
+        "fullName": "Admin User",
+        "avatar": "admin-avatar.jpg",
+        "role": "admin",
+        "isVerified": true,
+        "status": "active",
+        "createdAt": {
+            "$date": "2024-01-01T00:00:00.000Z"
+        }
+    },
+    {
+        "_id": {
+            "$oid": "64f123456789abcdef12345c"
+        },
+        "email": "alex.kumar@example.com",
+        "password": "$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi",
+        "fullName": "Alex Kumar",
+        "avatar": "alex-avatar.jpg",
+        "role": "user",
+        "isVerified": true,
+        "status": "active",
+        "createdAt": {
+            "$date": "2024-02-05T16:30:00.000Z"
+        }
+    },
+    {
+        "_id": {
+            "$oid": "64f123456789abcdef12345d"
+        },
+        "email": "priya.sharma@example.com",
+        "password": "$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi",
+        "fullName": "Priya Sharma",
+        "avatar": "priya-avatar.jpg",
+        "role": "facility_owner",
+        "isVerified": true,
+        "status": "active",
+        "createdAt": {
+            "$date": "2024-01-18T13:20:00.000Z"
+        }
+    }
+]

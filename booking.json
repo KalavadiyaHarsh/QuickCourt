@@ -1,0 +1,132 @@
+[
+  {
+    "_id": {"$oid": "64f444555666abcdef444555"},
+    "user": {"$oid": "64f123456789abcdef123456"},
+    "court": {"$oid": "64f111222333abcdef111222"},
+    "venue": {"$oid": "64f987654321abcdef987654"},
+    "date": {"$date": "2025-08-15T00:00:00.000Z"},
+    "timeSlots": [
+      {"startTime": "10:00", "endTime": "11:00"},
+      {"startTime": "11:00", "endTime": "12:00"}
+    ],
+    "totalAmount": 600,
+    "paymentStatus": "paid",
+    "bookingStatus": "confirmed",
+    "paymentMethod": "card",
+    "transactionId": "txn_abc123def456",
+    "createdAt": {"$date": "2025-08-10T14:30:00.000Z"}
+  },
+  {
+    "_id": {"$oid": "64f444555666abcdef444556"},
+    "user": {"$oid": "64f123456789abcdef123457"},
+    "court": {"$oid": "64f111222333abcdef111225"},
+    "venue": {"$oid": "64f987654321abcdef987655"},
+    "date": {"$date": "2025-08-12T00:00:00.000Z"},
+    "timeSlots": [
+      {"startTime": "18:00", "endTime": "19:00"}
+    ],
+    "totalAmount": 250,
+    "paymentStatus": "paid",
+    "bookingStatus": "confirmed",
+    "paymentMethod": "wallet",
+    "transactionId": "txn_def456ghi789",
+    "createdAt": {"$date": "2025-08-09T09:15:00.000Z"}
+  },
+  {
+    "_id": {"$oid": "64f444555666abcdef444557"},
+    "user": {"$oid": "64f123456789abcdef123456"},
+    "court": {"$oid": "64f111222333abcdef111224"},
+    "venue": {"$oid": "64f987654321abcdef987654"},
+    "date": {"$date": "2025-07-20T00:00:00.000Z"},
+    "timeSlots": [
+      {"startTime": "16:00", "endTime": "17:00"}
+    ],
+    "totalAmount": 500,
+    "paymentStatus": "paid",
+    "bookingStatus": "completed",
+    "paymentMethod": "card",
+    "transactionId": "txn_ghi789jkl012",
+    "createdAt": {"$date": "2025-07-18T11:00:00.000Z"}
+  },
+  {
+    "_id": {"$oid": "64f444555666abcdef444558"},
+    "user": {"$oid": "64f123456789abcdef123458"},
+    "court": {"$oid": "64f111222333abcdef111229"},
+    "venue": {"$oid": "64f987654321abcdef987656"},
+    "date": {"$date": "2025-08-14T00:00:00.000Z"},
+    "timeSlots": [
+      {"startTime": "19:00", "endTime": "20:00"}
+    ],
+    "totalAmount": 150,
+    "paymentStatus": "paid",
+    "bookingStatus": "confirmed",
+    "paymentMethod": "cash",
+    "transactionId": "txn_jkl012mno345",
+    "createdAt": {"$date": "2025-08-11T08:45:00.000Z"}
+  },
+  {
+    "_id": {"$oid": "64f444555666abcdef444559"},
+    "user": {"$oid": "64f123456789abcdef12345c"},
+    "court": {"$oid": "64f111222333abcdef11122c"},
+    "venue": {"$oid": "64f987654321abcdef987657"},
+    "date": {"$date": "2025-08-18T00:00:00.000Z"},
+    "timeSlots": [
+      {"startTime": "07:00", "endTime": "08:00"},
+      {"startTime": "08:00", "endTime": "09:00"}
+    ],
+    "totalAmount": 1400,
+    "paymentStatus": "paid",
+    "bookingStatus": "confirmed",
+    "paymentMethod": "card",
+    "transactionId": "txn_mno345pqr678",
+    "createdAt": {"$date": "2025-08-10T16:20:00.000Z"}
+  },
+  {
+    "_id": {"$oid": "64f444555666abcdef44455a"},
+    "user": {"$oid": "64f123456789abcdef123457"},
+    "court": {"$oid": "64f111222333abcdef11122e"},
+    "venue": {"$oid": "64f987654321abcdef987658"},
+    "date": {"$date": "2025-07-25T00:00:00.000Z"},
+    "timeSlots": [
+      {"startTime": "15:00", "endTime": "16:00"}
+    ],
+    "totalAmount": 280,
+    "paymentStatus": "paid",
+    "bookingStatus": "completed",
+    "paymentMethod": "wallet",
+    "transactionId": "txn_pqr678stu901",
+    "createdAt": {"$date": "2025-07-23T12:10:00.000Z"}
+  },
+  {
+    "_id": {"$oid": "64f444555666abcdef44455b"},
+    "user": {"$oid": "64f123456789abcdef123458"},
+    "court": {"$oid": "64f111222333abcdef111233"},
+    "venue": {"$oid": "64f987654321abcdef98765b"},
+    "date": {"$date": "2025-08-20T00:00:00.000Z"},
+    "timeSlots": [
+      {"startTime": "17:00", "endTime": "18:00"}
+    ],
+    "totalAmount": 180,
+    "paymentStatus": "paid",
+    "bookingStatus": "confirmed",
+    "paymentMethod": "card",
+    "transactionId": "txn_stu901vwx234",
+    "createdAt": {"$date": "2025-08-11T13:40:00.000Z"}
+  },
+  {
+    "_id": {"$oid": "64f444555666abcdef44455c"},
+    "user": {"$oid": "64f123456789abcdef123456"},
+    "court": {"$oid": "64f111222333abcdef111223"},
+    "venue": {"$oid": "64f987654321abcdef987654"},
+    "date": {"$date": "2025-07-30T00:00:00.000Z"},
+    "timeSlots": [
+      {"startTime": "20:00", "endTime": "21:00"}
+    ],
+    "totalAmount": 300,
+    "paymentStatus": "paid",
+    "bookingStatus": "cancelled",
+    "paymentMethod": "wallet",
+    "transactionId": "txn_vwx234yzab567",
+    "createdAt": {"$date": "2025-07-28T10:25:00.000Z"}
+  }
+]
