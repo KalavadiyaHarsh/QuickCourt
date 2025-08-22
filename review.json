@@ -1,0 +1,122 @@
+[
+  {
+    "_id": {"$oid": "64f777888999abcdef777888"},
+    "user": {"$oid": "64f123456789abcdef123456"},
+    "venue": {"$oid": "64f987654321abcdef987654"},
+    "rating": 5,
+    "comment": "Excellent facility with top-notch courts and great amenities. Staff is very helpful and professional.",
+    "createdAt": {"$date": "2025-07-21T15:30:00.000Z"}
+  },
+  {
+    "_id": {"$oid": "64f777888999abcdef777889"},
+    "user": {"$oid": "64f123456789abcdef123457"},
+    "venue": {"$oid": "64f987654321abcdef987658"},
+    "rating": 4,
+    "comment": "Good sports center with clean facilities. Parking could be better but overall great experience.",
+    "createdAt": {"$date": "2025-07-26T12:45:00.000Z"}
+  },
+  {
+    "_id": {"$oid": "64f777888999abcdef77788a"},
+    "user": {"$oid": "64f123456789abcdef123458"},
+    "venue": {"$oid": "64f987654321abcdef987655"},
+    "rating": 5,
+    "comment": "Amazing courts and excellent service. The coaching staff is very knowledgeable. Highly recommended!",
+    "createdAt": {"$date": "2024-12-15T09:20:00.000Z"}
+  },
+  {
+    "_id": {"$oid": "64f777888999abcdef77788b"},
+    "user": {"$oid": "64f123456789abcdef12345c"},
+    "venue": {"$oid": "64f987654321abcdef987657"},
+    "rating": 5,
+    "comment": "Premium tennis facility with perfect court maintenance. Worth every penny for serious players.",
+    "createdAt": {"$date": "2024-11-10T14:15:00.000Z"}
+  },
+  {
+    "_id": {"$oid": "64f777888999abcdef77788c"},
+    "user": {"$oid": "64f123456789abcdef123456"},
+    "venue": {"$oid": "64f987654321abcdef987656"},
+    "rating": 4,
+    "comment": "Great value for money. Courts are well-maintained and booking process is smooth.",
+    "createdAt": {"$date": "2024-10-05T18:00:00.000Z"}
+  },
+  {
+    "_id": {"$oid": "64f777888999abcdef77788d"},
+    "user": {"$oid": "64f123456789abcdef123457"},
+    "venue": {"$oid": "64f987654321abcdef987654"},
+    "rating": 4,
+    "comment": "Very good facility. The badminton courts are excellent and the timing is flexible.",
+    "createdAt": {"$date": "2024-09-20T10:30:00.000Z"}
+  },
+  {
+    "_id": {"$oid": "64f777888999abcdef77788e"},
+    "user": {"$oid": "64f123456789abcdef12345c"},
+    "venue": {"$oid": "64f987654321abcdef987655"},
+    "rating": 4,
+    "comment": "Good sports complex with multiple courts. The basketball court is particularly well-designed.",
+    "createdAt": {"$date": "2024-08-12T16:45:00.000Z"}
+  },
+  {
+    "_id": {"$oid": "64f777888999abcdef77788f"},
+    "user": {"$oid": "64f123456789abcdef123458"},
+    "venue": {"$oid": "64f987654321abcdef987659"},
+    "rating": 4,
+    "comment": "Modern facility with good squash courts. The fitness area is a nice addition.",
+    "createdAt": {"$date": "2024-07-08T11:20:00.000Z"}
+  },
+  {
+    "_id": {"$oid": "64f777888999abcdef777890"},
+    "user": {"$oid": "64f123456789abcdef123456"},
+    "venue": {"$oid": "64f987654321abcdef98765b"},
+    "rating": 3,
+    "comment": "Decent facility for the price. Good for casual games but facilities are basic.",
+    "createdAt": {"$date": "2024-06-15T13:10:00.000Z"}
+  },
+  {
+    "_id": {"$oid": "64f777888999abcdef777891"},
+    "user": {"$oid": "64f123456789abcdef12345c"},
+    "venue": {"$oid": "64f987654321abcdef987656"},
+    "rating": 5,
+    "comment": "Love this place! Great for table tennis and badminton. Very affordable and friendly staff.",
+    "createdAt": {"$date": "2024-05-22T17:35:00.000Z"}
+  },
+  {
+    "_id": {"$oid": "64f777888999abcdef777892"},
+    "user": {"$oid": "64f123456789abcdef123457"},
+    "venue": {"$oid": "64f987654321abcdef987657"},
+    "rating": 5,
+    "comment": "Best tennis club in the city! Professional grade courts and excellent maintenance.",
+    "createdAt": {"$date": "2024-04-18T08:50:00.000Z"}
+  },
+  {
+    "_id": {"$oid": "64f777888999abcdef777893"},
+    "user": {"$oid": "64f123456789abcdef123458"},
+    "venue": {"$oid": "64f987654321abcdef987654"},
+    "rating": 4,
+    "comment": "Premium quality courts with excellent lighting. Slightly expensive but worth it for the quality.",
+    "createdAt": {"$date": "2024-03-25T20:15:00.000Z"}
+  },
+  {
+    "_id": {"$oid": "64f777888999abcdef777894"},
+    "user": {"$oid": "64f123456789abcdef12345c"},
+    "venue": {"$oid": "64f987654321abcdef987658"},
+    "rating": 4,
+    "comment": "Great sports center with variety of courts. The volleyball court is amazing for team games.",
+    "createdAt": {"$date": "2024-02-14T14:25:00.000Z"}
+  },
+  {
+    "_id": {"$oid": "64f777888999abcdef777895"},
+    "user": {"$oid": "64f123456789abcdef123456"},
+    "venue": {"$oid": "64f987654321abcdef987659"},
+    "rating": 4,
+    "comment": "Clean facility with modern equipment. The squash court is in excellent condition.",
+    "createdAt": {"$date": "2024-01-30T12:40:00.000Z"}
+  },
+  {
+    "_id": {"$oid": "64f777888999abcdef777896"},
+    "user": {"$oid": "64f123456789abcdef123457"},
+    "venue": {"$oid": "64f987654321abcdef98765b"},
+    "rating": 4,
+    "comment": "Budget-friendly option with decent courts. Perfect for regular practice sessions.",
+    "createdAt": {"$date": "2024-01-15T19:05:00.000Z"}
+  }
+]

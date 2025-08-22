@@ -1,0 +1,268 @@
+[
+  {
+    "_id": {"$oid": "64f111222333abcdef111222"},
+    "name": "Badminton Court 1",
+    "sport": "badminton",
+    "venue": {"$oid": "64f987654321abcdef987654"},
+    "pricePerHour": 300,
+    "capacity": 4,
+    "operatingHours": {
+      "weekdays": {"open": "06:00", "close": "22:00"},
+      "weekends": {"open": "08:00", "close": "20:00"}
+    },
+    "unavailableSlots": [],
+    "createdAt": {"$date": "2024-01-10T08:30:00.000Z"}
+  },
+  {
+    "_id": {"$oid": "64f111222333abcdef111223"},
+    "name": "Badminton Court 2", 
+    "sport": "badminton",
+    "venue": {"$oid": "64f987654321abcdef987654"},
+    "pricePerHour": 300,
+    "capacity": 4,
+    "operatingHours": {
+      "weekdays": {"open": "06:00", "close": "22:00"},
+      "weekends": {"open": "08:00", "close": "20:00"}
+    },
+    "unavailableSlots": [],
+    "createdAt": {"$date": "2024-01-10T08:30:00.000Z"}
+  },
+  {
+    "_id": {"$oid": "64f111222333abcdef111224"},
+    "name": "Tennis Court 1",
+    "sport": "tennis",
+    "venue": {"$oid": "64f987654321abcdef987654"},
+    "pricePerHour": 500,
+    "capacity": 4,
+    "operatingHours": {
+      "weekdays": {"open": "06:00", "close": "22:00"},
+      "weekends": {"open": "08:00", "close": "20:00"}
+    },
+    "unavailableSlots": [],
+    "createdAt": {"$date": "2024-01-10T08:30:00.000Z"}
+  },
+  {
+    "_id": {"$oid": "64f111222333abcdef111225"},
+    "name": "Badminton Court A",
+    "sport": "badminton", 
+    "venue": {"$oid": "64f987654321abcdef987655"},
+    "pricePerHour": 250,
+    "capacity": 4,
+    "operatingHours": {
+      "weekdays": {"open": "05:00", "close": "23:00"},
+      "weekends": {"open": "07:00", "close": "21:00"}
+    },
+    "unavailableSlots": [],
+    "createdAt": {"$date": "2024-01-12T12:00:00.000Z"}
+  },
+  {
+    "_id": {"$oid": "64f111222333abcdef111226"},
+    "name": "Badminton Court B",
+    "sport": "badminton",
+    "venue": {"$oid": "64f987654321abcdef987655"},
+    "pricePerHour": 250,
+    "capacity": 4,
+    "operatingHours": {
+      "weekdays": {"open": "05:00", "close": "23:00"},
+      "weekends": {"open": "07:00", "close": "21:00"}
+    },
+    "unavailableSlots": [],
+    "createdAt": {"$date": "2024-01-12T12:00:00.000Z"}
+  },
+  {
+    "_id": {"$oid": "64f111222333abcdef111227"},
+    "name": "Tennis Court Pro",
+    "sport": "tennis",
+    "venue": {"$oid": "64f987654321abcdef987655"},
+    "pricePerHour": 400,
+    "capacity": 4,
+    "operatingHours": {
+      "weekdays": {"open": "05:00", "close": "23:00"},
+      "weekends": {"open": "07:00", "close": "21:00"}
+    },
+    "unavailableSlots": [],
+    "createdAt": {"$date": "2024-01-12T12:00:00.000Z"}
+  },
+  {
+    "_id": {"$oid": "64f111222333abcdef111228"},
+    "name": "Basketball Court",
+    "sport": "basketball",
+    "venue": {"$oid": "64f987654321abcdef987655"},
+    "pricePerHour": 600,
+    "capacity": 10,
+    "operatingHours": {
+      "weekdays": {"open": "05:00", "close": "23:00"},
+      "weekends": {"open": "07:00", "close": "21:00"}
+    },
+    "unavailableSlots": [],
+    "createdAt": {"$date": "2024-01-12T12:00:00.000Z"}
+  },
+  {
+    "_id": {"$oid": "64f111222333abcdef111229"},
+    "name": "Table Tennis 1",
+    "sport": "table-tennis",
+    "venue": {"$oid": "64f987654321abcdef987656"},
+    "pricePerHour": 150,
+    "capacity": 4,
+    "operatingHours": {
+      "weekdays": {"open": "07:00", "close": "21:00"},
+      "weekends": {"open": "09:00", "close": "19:00"}
+    },
+    "unavailableSlots": [],
+    "createdAt": {"$date": "2024-01-18T14:00:00.000Z"}
+  },
+  {
+    "_id": {"$oid": "64f111222333abcdef11122a"},
+    "name": "Table Tennis 2",
+    "sport": "table-tennis",
+    "venue": {"$oid": "64f987654321abcdef987656"},
+    "pricePerHour": 150,
+    "capacity": 4,
+    "operatingHours": {
+      "weekdays": {"open": "07:00", "close": "21:00"},
+      "weekends": {"open": "09:00", "close": "19:00"}
+    },
+    "unavailableSlots": [],
+    "createdAt": {"$date": "2024-01-18T14:00:00.000Z"}
+  },
+  {
+    "_id": {"$oid": "64f111222333abcdef11122b"},
+    "name": "Badminton Pro Court",
+    "sport": "badminton",
+    "venue": {"$oid": "64f987654321abcdef987656"},
+    "pricePerHour": 200,
+    "capacity": 4,
+    "operatingHours": {
+      "weekdays": {"open": "07:00", "close": "21:00"},
+      "weekends": {"open": "09:00", "close": "19:00"}
+    },
+    "unavailableSlots": [],
+    "createdAt": {"$date": "2024-01-18T14:00:00.000Z"}
+  },
+  {
+    "_id": {"$oid": "64f111222333abcdef11122c"},
+    "name": "Tennis Court Centre",
+    "sport": "tennis",
+    "venue": {"$oid": "64f987654321abcdef987657"},
+    "pricePerHour": 700,
+    "capacity": 4,
+    "operatingHours": {
+      "weekdays": {"open": "06:00", "close": "22:00"},
+      "weekends": {"open": "07:00", "close": "21:00"}
+    },
+    "unavailableSlots": [],
+    "createdAt": {"$date": "2024-01-25T10:30:00.000Z"}
+  },
+  {
+    "_id": {"$oid": "64f111222333abcdef11122d"},
+    "name": "Tennis Court Pro",
+    "sport": "tennis",
+    "venue": {"$oid": "64f987654321abcdef987657"},
+    "pricePerHour": 700,
+    "capacity": 4,
+    "operatingHours": {
+      "weekdays": {"open": "06:00", "close": "22:00"},
+      "weekends": {"open": "07:00", "close": "21:00"}
+    },
+    "unavailableSlots": [],
+    "createdAt": {"$date": "2024-01-25T10:30:00.000Z"}
+  },
+  {
+    "_id": {"$oid": "64f111222333abcdef11122e"},
+    "name": "Badminton Hall 1",
+    "sport": "badminton",
+    "venue": {"$oid": "64f987654321abcdef987658"},
+    "pricePerHour": 280,
+    "capacity": 4,
+    "operatingHours": {
+      "weekdays": {"open": "06:00", "close": "22:00"},
+      "weekends": {"open": "08:00", "close": "20:00"}
+    },
+    "unavailableSlots": [],
+    "createdAt": {"$date": "2024-02-01T16:00:00.000Z"}
+  },
+  {
+    "_id": {"$oid": "64f111222333abcdef11122f"},
+    "name": "Basketball Court",
+    "sport": "basketball",
+    "venue": {"$oid": "64f987654321abcdef987658"},
+    "pricePerHour": 500,
+    "capacity": 10,
+    "operatingHours": {
+      "weekdays": {"open": "06:00", "close": "22:00"},
+      "weekends": {"open": "08:00", "close": "20:00"}
+    },
+    "unavailableSlots": [],
+    "createdAt": {"$date": "2024-02-01T16:00:00.000Z"}
+  },
+  {
+    "_id": {"$oid": "64f111222333abcdef111230"},
+    "name": "Volleyball Court",
+    "sport": "volleyball",
+    "venue": {"$oid": "64f987654321abcdef987658"},
+    "pricePerHour": 450,
+    "capacity": 12,
+    "operatingHours": {
+      "weekdays": {"open": "06:00", "close": "22:00"},
+      "weekends": {"open": "08:00", "close": "20:00"}
+    },
+    "unavailableSlots": [],
+    "createdAt": {"$date": "2024-02-01T16:00:00.000Z"}
+  },
+  {
+    "_id": {"$oid": "64f111222333abcdef111231"},
+    "name": "Squash Court 1",
+    "sport": "squash",
+    "venue": {"$oid": "64f987654321abcdef987659"},
+    "pricePerHour": 350,
+    "capacity": 2,
+    "operatingHours": {
+      "weekdays": {"open": "06:00", "close": "22:00"},
+      "weekends": {"open": "08:00", "close": "20:00"}
+    },
+    "unavailableSlots": [],
+    "createdAt": {"$date": "2024-02-10T12:30:00.000Z"}
+  },
+  {
+    "_id": {"$oid": "64f111222333abcdef111232"},
+    "name": "Table Tennis Hall",
+    "sport": "table-tennis",
+    "venue": {"$oid": "64f987654321abcdef987659"},
+    "pricePerHour": 120,
+    "capacity": 4,
+    "operatingHours": {
+      "weekdays": {"open": "06:00", "close": "22:00"},
+      "weekends": {"open": "08:00", "close": "20:00"}
+    },
+    "unavailableSlots": [],
+    "createdAt": {"$date": "2024-02-10T12:30:00.000Z"}
+  },
+  {
+    "_id": {"$oid": "64f111222333abcdef111233"},
+    "name": "Budget Badminton",
+    "sport": "badminton",
+    "venue": {"$oid": "64f987654321abcdef98765b"},
+    "pricePerHour": 180,
+    "capacity": 4,
+    "operatingHours": {
+      "weekdays": {"open": "07:00", "close": "21:00"},
+      "weekends": {"open": "08:00", "close": "19:00"}
+    },
+    "unavailableSlots": [],
+    "createdAt": {"$date": "2024-02-15T14:30:00.000Z"}
+  },
+  {
+    "_id": {"$oid": "64f111222333abcdef111234"},
+    "name": "Community Basketball",
+    "sport": "basketball",
+    "venue": {"$oid": "64f987654321abcdef98765b"},
+    "pricePerHour": 400,
+    "capacity": 10,
+    "operatingHours": {
+      "weekdays": {"open": "07:00", "close": "21:00"},
+      "weekends": {"open": "08:00", "close": "19:00"}
+    },
+    "unavailableSlots": [],
+    "createdAt": {"$date": "2024-02-15T14:30:00.000Z"}
+  }
+]

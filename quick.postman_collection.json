@@ -1,0 +1,608 @@
+{
+	"info": {
+		"_postman_id": "015d067e-9bae-4bc3-afea-ab0d98239e1c",
+		"name": "quick",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "34381463"
+	},
+	"item": [
+		{
+			"name": "user",
+			"item": [
+				{
+					"name": "Get user profile details",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{QuickbaseURL}}/api/users/profile",
+							"host": [
+								"{{QuickbaseURL}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"profile"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "updateProfile",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"fullName\": \"harshhhh\",\r\n  \"avatar\": \"new-avatar.jpg\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{QuickbaseURL}}/api/users/profile",
+							"host": [
+								"{{QuickbaseURL}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"profile"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Venues",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"fullName\": \"John Smith\",\r\n  \"avatar\": \"new-avatar.jpg\"\r\n}"
+						},
+						"url": {
+							"raw": "{{QuickbaseURL}}/api/users/venues?search=sports&sport=badminton&minPrice=100&maxPrice=500&rating=4&city=Mumbai&page=1&limit=10",
+							"host": [
+								"{{QuickbaseURL}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"venues"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "sports"
+								},
+								{
+									"key": "sport",
+									"value": "badminton"
+								},
+								{
+									"key": "minPrice",
+									"value": "100"
+								},
+								{
+									"key": "maxPrice",
+									"value": "500"
+								},
+								{
+									"key": "rating",
+									"value": "4"
+								},
+								{
+									"key": "city",
+									"value": "Mumbai"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Single Venue",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"fullName\": \"John Smith\",\r\n  \"avatar\": \"new-avatar.jpg\"\r\n}"
+						},
+						"url": {
+							"raw": "{{QuickbaseURL}}/api/users/venues/64f987654321abcdef987654",
+							"host": [
+								"{{QuickbaseURL}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"venues",
+								"64f987654321abcdef987654"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Venue Courts",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"fullName\": \"John Smith\",\r\n  \"avatar\": \"new-avatar.jpg\"\r\n}"
+						},
+						"url": {
+							"raw": "{{QuickbaseURL}}/api/users/venues/64f987654321abcdef987654/courts?sport=badminton",
+							"host": [
+								"{{QuickbaseURL}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"venues",
+								"64f987654321abcdef987654",
+								"courts"
+							],
+							"query": [
+								{
+									"key": "sport",
+									"value": "badminton"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Court Availability",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"fullName\": \"John Smith\",\r\n  \"avatar\": \"new-avatar.jpg\"\r\n}"
+						},
+						"url": {
+							"raw": "{{QuickbaseURL}}/api/users/courts/64f111222333abcdef111223/availability?date=2025-08-15",
+							"host": [
+								"{{QuickbaseURL}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"courts",
+								"64f111222333abcdef111223",
+								"availability"
+							],
+							"query": [
+								{
+									"key": "date",
+									"value": "2025-08-15"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Booking",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"courtId\": \"64f111222333abcdef111223\",\r\n  \"venueId\": \"64f987654321abcdef987654\",\r\n  \"date\": \"2025-08-15\",\r\n  \"timeSlots\": [\r\n    {\r\n      \"startTime\": \"07:00\",\r\n      \"endTime\": \"08:00\"\r\n    },\r\n    {\r\n      \"startTime\": \"08:00\", \r\n      \"endTime\": \"09:00\"\r\n    }\r\n  ],\r\n  \"paymentMethod\": \"card\",\r\n  \"transactionId\": \"txn_abc123\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{QuickbaseURL}}/api/users/bookings",
+							"host": [
+								"{{QuickbaseURL}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"bookings"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get user booking",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"courtId\": \"64f111222333abcdef111223\",\r\n  \"venueId\": \"64f987654321abcdef987654\",\r\n  \"date\": \"2025-08-15\",\r\n  \"timeSlots\": [\r\n    {\r\n      \"startTime\": \"07:00\",\r\n      \"endTime\": \"08:00\"\r\n    },\r\n    {\r\n      \"startTime\": \"8:00\", \r\n      \"endTime\": \"9:00\"\r\n    }\r\n  ],\r\n  \"paymentMethod\": \"card\",\r\n  \"transactionId\": \"txn_abc123\"\r\n}"
+						},
+						"url": {
+							"raw": "{{QuickbaseURL}}/api/users/bookings?status=confirmed&page=1&limit=10",
+							"host": [
+								"{{QuickbaseURL}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"bookings"
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "confirmed"
+								},
+								{
+									"key": "date",
+									"value": "2025-08-15",
+									"disabled": true
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cancel Booking",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"courtId\": \"64f111222333abcdef111223\",\r\n  \"venueId\": \"64f987654321abcdef987654\",\r\n  \"date\": \"2025-08-15\",\r\n  \"timeSlots\": [\r\n    {\r\n      \"startTime\": \"07:00\",\r\n      \"endTime\": \"08:00\"\r\n    },\r\n    {\r\n      \"startTime\": \"8:00\", \r\n      \"endTime\": \"9:00\"\r\n    }\r\n  ],\r\n  \"paymentMethod\": \"card\",\r\n  \"transactionId\": \"txn_abc123\"\r\n}"
+						},
+						"url": {
+							"raw": "{{QuickbaseURL}}/api/users/bookings/689a3d736972e92eac6b9ff1/cancel",
+							"host": [
+								"{{QuickbaseURL}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"bookings",
+								"689a3d736972e92eac6b9ff1",
+								"cancel"
+							],
+							"query": [
+								{
+									"key": "date",
+									"value": "2025-08-15",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "auth",
+			"item": [
+				{
+					"name": "User Login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"email\": \"hp796719@gmail.com\",\r\n  \"password\": \"password123\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{QuickbaseURL}}/api/auth/login",
+							"host": [
+								"{{QuickbaseURL}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"fullName\": \"John Doe\",\r\n  \"email\": \"hp796719@gmail.com\",\r\n  \"password\": \"password123\",\r\n  \"role\": \"user\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{QuickbaseURL}}/api/auth/register",
+							"host": [
+								"{{QuickbaseURL}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Resend Otp",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"email\": \"john.doe@example.com\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{QuickbaseURL}}/api/auth/resend-otp",
+							"host": [
+								"{{QuickbaseURL}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"resend-otp"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Verify Otp",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"email\": \"hp796719@gmail.com\",\r\n  \"otp\": \"525974\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{QuickbaseURL}}/api/auth/verify-email",
+							"host": [
+								"{{QuickbaseURL}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"verify-email"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Home",
+			"item": [
+				{
+					"name": "Get Home Data",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{QuickbaseURL}}/api/home",
+							"host": [
+								"{{QuickbaseURL}}"
+							],
+							"path": [
+								"api",
+								"home"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search Venues",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"fullName\": \"John Smith\",\r\n  \"avatar\": \"new-avatar.jpg\"\r\n}"
+						},
+						"url": {
+							"raw": "{{QuickbaseURL}}/api/home/search?q=badminton&sport=badminton&city=Mumbai&minPrice=100&maxPrice=500&rating=4&amenities=parking,wifi&page=1&limit=10",
+							"host": [
+								"{{QuickbaseURL}}"
+							],
+							"path": [
+								"api",
+								"home",
+								"search"
+							],
+							"query": [
+								{
+									"key": "q",
+									"value": "badminton"
+								},
+								{
+									"key": "sport",
+									"value": "badminton"
+								},
+								{
+									"key": "city",
+									"value": "Mumbai"
+								},
+								{
+									"key": "minPrice",
+									"value": "100"
+								},
+								{
+									"key": "maxPrice",
+									"value": "500"
+								},
+								{
+									"key": "rating",
+									"value": "4"
+								},
+								{
+									"key": "amenities",
+									"value": "parking,wifi"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Popular Venues",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{QuickbaseURL}}/api/users/venues/popular",
+							"host": [
+								"{{QuickbaseURL}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"venues",
+								"popular"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Available Sports",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "Get Venue Suggestions",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4OWEyNzBhODQ0Y2ViMzYzMmZiZGM0ZiIsImlhdCI6MTc1NDkzMzMyNywiZXhwIjoxNzU0OTUxMzI3fQ.yU85Z3Cu1v8GCmuAEqWMuIBIGrkY4f-nMdBDsBucsPU",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "QuickbaseURL",
+			"value": "http://localhost:8000",
+			"type": "default"
+		}
+	]
+}
